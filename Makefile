@@ -12,3 +12,4 @@ kernel:
 
 observer: observer.c Makefile
 	gcc -g observer.c -lnl-genl -lnl -o observer
+	#gcc -static -I ../libnl-3.2.7/include -g observer.c -L ../libnl-3.2.7/lib/.libs/ -lnl-genl-3 -lnl-3 -lm -lpthread -lc -o observer

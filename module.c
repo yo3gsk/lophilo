@@ -12,9 +12,10 @@
  
 static int __init lophilo_init(void)
 {
-	printk(KERN_INFO "INIT LOPHILO\n");
 	struct file_operations* map_fops;
 	int rc;
+
+	printk(KERN_INFO "INIT LOPHILO\n");
 
 	rc = lophilo_data_init();
 	if(rc)

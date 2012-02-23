@@ -31,14 +31,14 @@ __attribute__((section("__versions"))) = {
 	{ 0xb4390f9a, "mcount" },
 	{ 0xf6b14cdc, "nla_put" },
 	{ 0xce095088, "mod_timer" },
+	{ 0x862b902a, "netlink_unicast" },
 	{ 0x1b92e0fa, "genl_register_family_with_ops" },
-	{ 0x7f3a7f55, "init_net" },
 	{ 0x5062db4c, "__alloc_skb" },
-	{ 0x5a24ecce, "netlink_broadcast" },
 	{ 0x3bd1b1f6, "msecs_to_jiffies" },
 	{ 0x6e712077, "kmem_cache_alloc_trace" },
 	{ 0x37a0cba, "kfree" },
 	{ 0x559e4626, "remap_pfn_range" },
+	{ 0x793431a5, "genl_register_mc_group" },
 	{ 0x1ed9e8f3, "skb_put" },
 };
 
@@ -48,4 +48,4 @@ __attribute__((section(".modinfo"))) =
 "depends=";
 
 
-MODULE_INFO(srcversion, "7DCED78BC87A1C3CF415EC6");
+MODULE_INFO(srcversion, "9D02A13455978451E2605C8");
