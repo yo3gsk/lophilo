@@ -64,7 +64,8 @@ int main(void)
 	printf("preparing socket\n");
 	sock = nl_socket_alloc();
 	// FIXME: NL_CB_VALID not working
-	nl_socket_modify_cb(sock, NL_CB_MSG_IN, NL_CB_CUSTOM, handler, EMPTY_ARG);
+	//nl_socket_modify_cb(sock, NL_CB_MSG_IN, NL_CB_CUSTOM, handler, EMPTY_ARG);
+	nl_socket_modify_cb(sock, NL_CB_VALID, NL_CB_CUSTOM, handler, EMPTY_ARG);
 	nl_join_groups(sock, group); // join group before connect
 	nl_socket_disable_seq_check(sock); //we're going to get unsolicited messages
 	nl_socket_recv_pktinfo(sock, 1); // for debugging...
