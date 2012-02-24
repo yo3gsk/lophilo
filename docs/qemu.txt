@@ -1,0 +1,173 @@
+setenv serverip 10.236.10.94
+setenv bootfile uImage/kernel-uimage
+setenv rootpath /home/rngadam/mini2440/root_fs
+setenv bootargs serial=ttySAC0 console=ttySAC0,115200 ip=10.236.10.145 noinitrd init=/sbin/init mini2440=0tb root=/dev/nfs rw nfsroot=${serverip}:/home/rngadam/mini2440/root_fs nfsrootdebug single
+saveenv
+dhcp
+
+setenv serverip 10.236.10.94
+setenv bootfile uImage/kernel-uimage
+setenv bootargs console=ttySAC0,115200 ip=dhcp noinitrd init=/bin/sh mini2440=0tb root=/dev/nfs rw nfsroot=10.236.10.94:/home/rngadam/mini2440/root_fs nfsrootdebug
+saveenv
+dhcp
+
+setenv serverip 10.236.10.94
+setenv bootargs console=ttySAC0 ip=dhcp noinitrd init=/bin/sh root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/root_fs nfsrootdebug
+saveenv
+dhcp
+
+setenv serverip 10.236.10.94
+setenv bootargs console=ttySAC0,115200 ip=dhcp noinitrd init=/bin/sh root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/root_fs nfsrootdebug
+dhcp
+
+
+mmcinit
+setenv serverip 10.236.10.94
+setenv bootargs console=ttySAC0,115200 noinitrd root=/dev/mmcblk0p2 rootfstype=ext3 rootwait mini2440=0tb init=/bin/sh
+dhcp
+bootm
+
+mmcinit
+setenv bootargs console=ttySAC0,115200 ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/root_fs nfsrootdebug
+bootm
+
+setenv bootargs console=ttySAC0,115200 ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/angstrom nfsrootdebug
+
+setenv bootargs console=tty0 console=ttySAC0,115200 ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/angstrom nfsrootdebug
+
+NETCONSOLE
+setenv bootargs console=tty0 console=ttySAC0,115200 ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/angstrom nfsrootdebug netconsole=5555@10.236.10.145/eth0,4444@10.236.10.94/00:e0:4d:9b:27:5e debug
+nc -l -u 4444
+
+S0
+
+setenv bootargs console=tty0 console=ttyS0,115200 ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/angstrom nfsrootdebug netconsole=5555@10.236.10.145/eth0,4444@10.236.10.94/00:e0:4d:9b:27:5e debug
+
+CLEANER
+
+setenv bootargs console=ttySAC0,115200 ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/angstrom nfsrootdebug debug
+
+BASH
+
+setenv bootargs console=ttySAC0,115200 ip=dhcp noinitrd init=/bin/sh root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/angstrom nfsrootdebug 
+
+LENNY
+
+setenv bootargs console=ttySAC0,115200 ip=dhcp noinitrd init=/bin/sh root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/armel-lenny nfsrootdebug debug
+
+kernel: drivers/tty/serial/samsung*
+qemu: hw/mini2440.c
+rootfs: /etc/inittab
+
+S:2345:respawn:/sbin/getty 115200 ttySAC0
+
+alternate name: s3c2410_serial0 
+
+hardware interface: http://www.friendlyarm.net/forum/topic/1580
+
+compiling kernel 2.6: http://wiki.linuxmce.org/index.php/Mini2440#Kernel
+
+Serial: 8250/16550 driver, 4 ports, IRQ sharing enabled
+s3c2440-uart.0: ttySAC0 at MMIO 0x50000000 (irq = 70) is a S3C2440
+console [ttySAC0] enabled
+s3c24xx_serial_probe(c05192f0) 1
+s3c24xx_serial_probe: initialising port c0527058...
+s3c24xx_serial_init_port: port=c0527078, platdev=c05192f0
+resource c051516c (50004000..50007fff)
+port: map=50004000, mem=f7004000, irq=73 (73,74), clock=1
+s3c24xx_serial_probe: adding port
+s3c2440-uart.1: ttySAC1 at MMIO 0x50004000 (irq = 73) is a S3C2440
+s3c24xx_serial_probe(c05193dc) 2
+s3c24xx_serial_probe: initialising port c0527120...
+s3c24xx_serial_init_port: port=c0527140, platdev=c05193dc
+resource c05151a4 (50008000..5000bfff)
+port: map=50008000, mem=f7008000, irq=76 (76,77), clock=1
+s3c24xx_serial_probe: adding port
+s3c2440-uart.2: ttySAC2 at MMIO 0x50008000 (irq = 76) is a S3C2440
+[...]
+s3c24xx_serial_startup: port=50000000 (f7000000,c05272b0)
+requesting tx irq...
+s3c24xx_serial_startup ok
+udivslot = 54aa (div 7)
+config: 8bits/char
+setting ulcon to 00000003, brddiv to 26, udivslot 000054aa
+s3c_uart_write: Bad register 0x2c
+uart: ulcon = 0x00000003, ucon = 0x00000385, ufcon = 0x00000011
+
+/home/rngadam/friendlyarm/opt/FriendlyARM/toolschain/4.4.3/bin/arm-none-linux-gnueabi-
+
+
+== console ==
+
+One way to ensure a working console (since the console= paramters in
+cmdline seems to work) is to add the following line into your
+/etc/inittab:
+
+::respawn:-/bin/sh
+
+That will open up /bin/sh directly on the same console already in use
+by the kernel.
+
+
+== modules ==
+make -j4 modules
+make modules_install INSTALL_MOD_PATH=/exports/mini2440/armel-lenny
+
+http://www.freshblurbs.com/install-node-js-and-express-js-nginx-debian-lenny
+
+http://code.google.com/p/mini6410-debian/wiki/Tutorial
+
+
+export PATH=$PATH:/home/rngadam/uboot/tools/
+make -j4 uImage
+cp arch/arm/boot/uImage /tftpboot/uImage-Linux-3.3-rc1-dirty-clean
+~/bin/img /tftpboot/uImage-Linux-3.3-rc1-dirty-clean
+make -j4 modules_install INSTALL_MOD_PATH=/exports/mini2440/armel-squeeze
+
+setenv bootargs console=ttySAC0,115200 ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/armel-squeeze nfsrootdebug
+
+= usage =
+
+sudo /etc/qemu-ifup tap0
+sudo ./mini2440/mini2440_start.sh
+MINI2440 # dhcp
+MINI2440 # mmcinit
+MINI2440 # bootm
+
+setenv bootargs console=s3c2410_serial0,115200 ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/armel-squeeze nfsrootdebug
+
+setenv bootargs ${bootargs} single
+
+= interesting =
+
+http://balau82.wordpress.com/2010/04/12/booting-linux-with-u-boot-on-qemu-arm/
+
+= kernel 3.3 rc1: s3c_uart_write: Bad register 0x2c =
+
+~/qemu/hw/s3c2410.c: 
+
+static void s3c_uart_write(void *opaque, target_phys_addr_t addr,
+                uint32_t value)
+{
+    [...]
+    default:
+        printf("%s: Bad register 0x%lx\n", __FUNCTION__, (unsigned long)addr);
+    }
+}
+
+
+= qemu build =
+
+wget http://repo.or.cz/w/qemu/mini2440.git/snapshot/18b91f222c2aebb2eb45cb7e6d5f58ca668e2aa2.tar.gz
+tar xvfz 18b91f222c2aebb2eb45cb7e6d5f58ca668e2aa2.tar.gz
+cd mini2440
+apt-get install libsdl-dev
+./configure --prefix=/home/rngadam/qemu --target-list=arm-softmmu --kerneldir=/home/rngadam/linux-stable
+
+= reducing network access =
+
+http://www.digriz.org.uk/debian-nfs-root
+
+= compile options for FriendlyARM =
+
+-Wall -O0 -ansi -pedantic -msoft-float -D__GCC_FLOAT_NOT_NEEDED  -march=armv4t -mtune=arm920t 

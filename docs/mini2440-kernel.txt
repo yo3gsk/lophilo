@@ -1,0 +1,174 @@
+= kernel 3.3 features =
+CONFIG_CROSS_COMPILE=y
+CONFIG_LOCALVERSION=-meteroi-mini2440
+CONFIG_DEFAULT_HOSTNAME=mini2440
+
+
+*
+* Boot options
+*
+S3C Initialisation watchdog (S3C_BOOT_WATCHDOG) [N/y/?] n
+S3C Reboot on decompression error (S3C_BOOT_ERROR_RESET) [N/y/?] n
+Force UART FIFO on during boot process (S3C_BOOT_UART_FORCE_FIFO) [Y/n/?] y
+S3C UART to use for low-level messages (S3C_LOWLEVEL_UART_PORT) [0] 0
+Number of additional GPIO pins (SAMSUNG_GPIO_EXTRA) [0] (NEW)
+Space between gpio banks (S3C_GPIO_SPACE) [0] 0
+ADC common driver support (S3C_ADC) [Y/?] (NEW) y
+PWM device support (S3C24XX_PWM) [N/y/?] n
+*
+* Power management
+*
+S3C2410 PM Suspend debug (SAMSUNG_PM_DEBUG) [N/y/?] (NEW)
+S3C2410 PM Suspend Memory CRC (SAMSUNG_PM_CHECK) [N/y/?] (NEW)
+*
+* Power Domain
+*
+S3C2410 DMA support (S3C2410_DMA) [Y/n/?] y
+  S3C2410 DMA support debug (S3C2410_DMA_DEBUG) [N/y/?] n
+*
+* System MMU
+*
+*
+* S3C2410 Machines
+*
+SMDK2410/A9M2410 (ARCH_SMDK2410) [N/y/?] n
+IPAQ H1940 (ARCH_H1940) [N/y/?] n
+Acer N30 family (MACH_N30) [N/y/?] n
+Simtec Electronics BAST (EB2410ITX) (ARCH_BAST) [N/y/?] n
+NexVision OTOM Board (MACH_OTOM) [N/y/?] n
+AML M5900 Series (MACH_AML_M5900) [N/y/?] n
+TCT Hammer Board (MACH_TCT_HAMMER) [N/y/?] n
+Thorcom VR1000 (MACH_VR1000) [N/y/?] n
+QT2410 (MACH_QT2410) [N/y/?] n
+
+*
+* S3C2412 Machines
+*
+Logitech Jive (MACH_JIVE) [N/y/?] n
+SMDK2413 (MACH_SMDK2413) [N/y/?] n
+SMDK2412 (MACH_SMDK2412) [N/y/?] n
+VMSTMS (MACH_VSTMS) [N/y/?] n
+*
+* S3C2416 Machines
+*
+SMDK2416 (MACH_SMDK2416) [N/y/?] (NEW)
+*
+* S3C2440 and S3C2442 Machines
+*
+Simtec Electronics ANUBIS (MACH_ANUBIS) [N/y/?] n
+Openmoko GTA02 / Freerunner phone (MACH_NEO1973_GTA02) [N/y/?] n
+Simtec IM2440D20 (OSIRIS) module (MACH_OSIRIS) [N/y/?] n
+HP iPAQ rx3715 (MACH_RX3715) [N/y/?] n
+SMDK2440 (ARCH_S3C2440) [N/y/?] n
+*
+* Memory Technology Device (MTD) support
+*
+Memory Technology Device (MTD) support (MTD) [Y/n/m/?] y
+
+
+  *
+  * User Modules And Translation Layers
+  *
+  Direct char device access to MTD devices (MTD_CHAR) [Y/n/m/?] y
+  Common interface to block layer for MTD 'translation layers' (MTD_BLKDEVS) [Y] y
+  Caching block device access to MTD devices (MTD_BLOCK) [Y/n/m/?] y
+
+  *
+  * NAND Device Support
+  *
+  NAND Device Support (MTD_NAND) [Y/n/m/?] y
+
+  DM9000 support (DM9000) [Y/n/m/?] y
+    Force simple NSR based PHY polling (DM9000_FORCE_SIMPLE_PHY_POLL) [N/y/?] n
+
+*
+* Non-8250 serial port support
+*
+Samsung SoC serial support (SERIAL_SAMSUNG) [Y/n/m/?] y
+Support for console on Samsung SoC serial port (SERIAL_SAMSUNG_CONSOLE) [Y/n/?] y
+
+  S3C2410 I2C Driver (I2C_S3C2410) [Y/n/m/?] y
+
+*
+* ALSA for SoC audio support
+*
+ALSA for SoC audio support (SND_SOC) [Y/n/m/?] y
+  ASoC support for Samsung (SND_SOC_SAMSUNG) [N/m/y/?] (NEW)
+  Build all ASoC CODEC drivers (SND_SOC_ALL_CODECS) [N/m/y/?] n
+
+
+*
+* MMC/SD/SDIO card support
+*
+MMC/SD/SDIO card support (MMC) [Y/n/m/?] y
+  Samsung S3C SD/MMC Card Interface support (MMC_S3C) [Y/n/m/?] y
+    Hardware support for SDIO IRQ (MMC_S3C_HW_SDIO_IRQ) [N/y/?] n
+    Samsung S3C SD/MMC transfer code
+    > 1. Use PIO transfers only (MMC_S3C_PIO)
+      2. Use DMA transfers only (EXPERIMENTAL) (MMC_S3C_DMA)
+      3. Support for both PIO and DMA (EXPERIMENTAL) (MMC_S3C_PIODMA)
+    choice[1-3]: 1
+
+  *
+  * on-CPU RTC drivers
+  *
+  Samsung S3C series SoC RTC (RTC_DRV_S3C) [Y/n/m/?] y
+
+
+*
+* Network File Systems
+*
+Network File Systems (NETWORK_FILESYSTEMS) [Y/n/?] y
+  NFS client support (NFS_FS) [Y/n/m/?] y
+    NFS client support for NFS version 3 (NFS_V3) [Y/n/?] y
+      NFS client support for the NFSv3 ACL protocol extension (NFS_V3_ACL) [N/y/?] n
+    NFS client support for NFS version 4 (NFS_V4) [N/y/?] n
+  Root file system on NFS (ROOT_NFS) [Y/n/?] y
+
+MISC_DEVICES && I2C && SYSFS
+
+CONFIG_IP_PNP && CONFIG_ROOT_NFS
+
+= building the kernel notes =
+
+change general setup for various default strings and default hostname
+manually disabled every network except for DM9000
+change NFS client to be built-in instead of a module
+
+export PATH=$PATH:~/uboot/tools/
+cp /home/rngadam/friendlyarm/linux-2.6.32.2/.config /home/rngadam/linux-stable-mini2440-builds
+yes "" | make O=/home/rngadam/linux-stable-mini2440-builds oldconfig
+make O=/home/rngadam/linux-stable-mini2440-builds -j4 uImage
+cp ../linux-stable-mini2440-builds/arch/arm/boot/uImage /tftpboot/`make O=../linux-stable-mini2440-builds -j4 kernelrelease`
+~/bin/img /tftpboot/`make O=../linux-stable-mini2440-builds -j4 kernelrelease`
+make O=/home/rngadam/linux-stable-mini2440-builds -j4 modules
+make O=/home/rngadam/linux-stable-mini2440-builds modules_install INSTALL_MOD_PATH=/exports/mini2440/armel-lenny
+mv /exports/mini2440/armel-lenny/lib/modules/3.3.0-rc1-dirty /exports/mini2440/armel-lenny/lib/modules/3.3.0-rc1-meteroi-mini2440-dirty
+
+= compile error =
+
+/home/rngadam/linux-stable/net/core/pktgen.c: In function ¡®pktgen_if_show¡¯:
+/home/rngadam/linux-stable/net/core/pktgen.c:682:2: error: can¡¯t find a register in class ¡®GENERAL_REGS¡¯ while reloading ¡®asm¡¯
+/home/rngadam/linux-stable/net/core/pktgen.c:682:2: error: can¡¯t find a register in class ¡®GENERAL_REGS¡¯ while reloading ¡®asm¡¯
+/home/rngadam/linux-stable/net/core/pktgen.c:682:2: error: ¡®asm¡¯ operand has impossible constraints
+/home/rngadam/linux-stable/net/core/pktgen.c:682:2: error: ¡®asm¡¯ operand has impossible constraints
+
+
+= using latest git =
+
+tosa.c:static QEMUMachine tosapda_machine = {
+tosa.c:static void tosapda_machine_init(void)
+tosa.c:    qemu_register_machine(&tosapda_machine);
+tosa.c:machine_init(tosapda_machine_init);
+
+arm-softmmu/tosa.d:tosa.o: /home/rngadam/qemu-stable/hw/tosa.c \
+
+
+= compile error =
+
+In file included from /home/rngadam/qemu-stable/hw/mini2440.c:10:0:
+/home/rngadam/qemu-stable/hw/s3c.h:187:29: error: unknown type name ¡®NANDFlashState¡¯
+/home/rngadam/qemu-stable/hw/s3c.h:188:1: error: no semicolon at end of struct or union [-Werror]
+/home/rngadam/qemu-stable/hw/mini2440.c:22:20: fatal error: dm9000.h: No such file or directory
+
+

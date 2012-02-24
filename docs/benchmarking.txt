@@ -1,0 +1,12 @@
+= benchmarking =
+
+sudo apt-get install apache2-utils
+
+see tests/ directory
+
+= Some stats =
+
+(binary with no SSL included, statically built)
+
+unstripped: 6.9M
+stripped: 5.1M

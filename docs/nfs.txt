@@ -1,0 +1,19 @@
+
+= NFS mounting =
+
+heavy NFS writes cause NFS to hang:
+
+root@mini2440:~# dpkg --configure -a
+Setting up python2.6 (2.6.6-8+b1) ...
+nfs: server 10.236.10.94 not responding, still trying
+
+NFS: nfs mount opts='vers=4,udp,rsize=4096,wsize=4096,nolock,addr=10.236.10.94'
+NFS:   parsing nfs mount option 'vers=2'
+NFS:   parsing nfs mount option 'udp'
+NFS:   parsing nfs mount option 'rsize=4096'
+NFS:   parsing nfs mount option 'wsize=4096'
+NFS:   parsing nfs mount option 'nolock'
+NFS:   parsing nfs mount option 'addr=10.236.10.94'
+
+setenv bootargs console=ttySAC0,115200 ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/armel-squeeze,vers=3,rsize=1024,wsize=1024 nfsrootdebug rootwait
+

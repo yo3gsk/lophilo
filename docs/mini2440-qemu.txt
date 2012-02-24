@@ -1,0 +1,31 @@
+= second stage (booting at shell) =
+
+setenv bootargs  console=ttySAC0,115200 ip=dhcp noinitrd init=/bin/sh root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/armel-squeeze nfsrootdebug
+
+# echo "proc /proc proc none 0 0" >>etc/fstab
+# echo "mini2440" >etc/hostname
+# mknod dev/console c 5 1
+
+root@yap:/mnt/arm# *mknod dev/ttySAC0 c 204 64* 
+
+
+# mknod dev/ttySAC0 c 204 64
+# /debootstrap/debootstrap --second-stage
+# echo "ttySAC0" >> /etc/securetty
+# # make sure the printf actually turns the \n into a new line
+# printf "T0:123:respawn:/sbin/getty 115200 ttySAC0\n" >> /etc/inittab
+
+# # don't do this, it fucks up the NFS root mount...
+# printf "auto eth0\niface eth0 inet dhcp\n" >> /etc/network/interfaces 
+
+use the output of http://debgen.simplylinux.ch/ for /etc/apt/sources.list
+
+# passwd
+# reboot -f
+
+setenv bootargs console=ttySAC0,115200 ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/armel-squeeze nfsrootdebug
+saveenv
+dhcp
+bootm
+
+setenv bootargs ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/armel-squeeze nfsrootdebug rootwait

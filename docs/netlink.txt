@@ -1,0 +1,471 @@
+= where to start =
+
+read:
+
+http://tomoyo.sourceforge.jp/cgi-bin/lxr/source/include/linux/netlink.h
+http://tomoyo.sourceforge.jp/cgi-bin/lxr/source/include/net/genetlink.h
+
+use NLCB=debug for debugging at the command-line for userspace apps
+
+= nl_connect =
+
+
+= Calls of multicast =
+
+* genlmsg_multicast
+** genlmsg_multicast_netns
+*** nlmsg_multicast
+**** netlink_broadcast
+***** netlink_broadcast_filtered
+****** do_one_broadcast http://tomoyo.sourceforge.jp/cgi-bin/lxr/source/net/netlink/af_netlink.c#L1043
+******* netlink_broadcast_deliver
+******** sk->sk_data_ready(sk, skb->len); (by default, sk_data_ready is set to empty netlink_data_ready
+********* socket_def_readable?
+********** sk_wake_async
+***********
+1989 static void sock_def_readable(struct sock *sk, int len)
+1990 {
+1991         struct socket_wq *wq;
+1992 
+1993         rcu_read_lock();
+1994         wq = rcu_dereference(sk->sk_wq);
+1995         if (wq_has_sleeper(wq))
+1996                 wake_up_interruptible_sync_poll(&wq->wait, POLLIN | POLLPRI |
+1997                                                 POLLRDNORM | POLLRDBAND);
+1998         sk_wake_async(sk, SOCK_WAKE_WAITD, POLL_IN);
+1999         rcu_read_unlock();
+
+
+1043 int netlink_broadcast_filtered(struct sock *ssk, struct sk_buff *skb, u32 pid,
+1044         u32 group, gfp_t allocation,
+1045         int (*filter)(struct sock *dsk, struct sk_buff *skb, void *data),
+1046         void *filter_data)
+1047 {
+1048         struct net *net = sock_net(ssk);
+1049         struct netlink_broadcast_data info;
+1050         struct hlist_node *node;
+1051         struct sock *sk;
+1052 
+1053         skb = netlink_trim(skb, allocation);
+1054 
+1055         info.exclude_sk = ssk;
+1056         info.net = net;
+1057         info.pid = pid;
+1058         info.group = group;
+1059         info.failure = 0;
+1060         info.delivery_failure = 0;
+1061         info.congested = 0;
+1062         info.delivered = 0;
+1063         info.allocation = allocation;
+1064         info.skb = skb;
+1065         info.skb2 = NULL;
+1066         info.tx_filter = filter;
+1067         info.tx_data = filter_data;
+1068 
+1069         /* While we sleep in clone, do not allow to change socket list */
+1070 
+1071         netlink_lock_table();
+1072 
+1073         sk_for_each_bound(sk, node, &nl_table[ssk->sk_protocol].mc_list)
+1074                 do_one_broadcast(sk, &info);
+1075 
+1076         consume_skb(skb);
+1077 
+1078         netlink_unlock_table();
+1079 
+1080         if (info.delivery_failure) {
+1081                 kfree_skb(info.skb2);
+1082                 return -ENOBUFS;
+1083         } else
+1084                 consume_skb(info.skb2);
+1085 
+1086         if (info.delivered) {
+1087                 if (info.congested && (allocation & __GFP_WAIT))
+1088                         yield();
+1089                 return 0;
+1090         }
+1091         return -ESRCH;
+1092 }
+
+= support for multicast group resolve in libnl (userspace) =
+
+http://lists.infradead.org/pipermail/libnl/2010-June/000100.html
+
+Essentially it add one new function genl_ctrl_resolve_grp which
+prototype looks like this
+int genl_ctrl_resolve_grp(struct nl_sock *sk, const char *family_name,
+	const char *grp_name)
+It resolves  the family name and the group name to group id. Then
+the returned id can be used in nl_socket_add_membership to subscribe
+to multicast messages.
+
+= use of genetlink in drop_monitor =
+
+looking at:
+
+source file:
+
+http://tomoyo.sourceforge.jp/cgi-bin/lxr/source/net/core/drop_monitor.c
+
+header file:
+
+http://tomoyo.sourceforge.jp/cgi-bin/lxr/source/include/linux/net_dropmon.h
+
+- relevant includes
+
+ 19 #include <linux/netlink.h>
+[...]
+ 25 #include <net/genetlink.h>
+ 26 #include <net/netevent.h>
+
+- create a command enumeration:
+
+ 49 enum {
+ 50         NET_DM_CMD_UNSPEC = 0,
+ 51         NET_DM_CMD_ALERT,
+ 52         NET_DM_CMD_CONFIG,
+ 53         NET_DM_CMD_START,
+ 54         NET_DM_CMD_STOP,
+ 55         _NET_DM_CMD_MAX,
+ 56 };
+ 57 
+ 58 #define NET_DM_CMD_MAX (_NET_DM_CMD_MAX - 1)
+
+- create family instance
+
+ 62 static struct genl_family net_drop_monitor_family = {
+ 63         .id             = GENL_ID_GENERATE,
+ 64         .hdrsize        = 0,
+ 65         .name           = "NET_DM",
+ 66         .version        = 2,
+ 67         .maxattr        = NET_DM_CMD_MAX,
+ 68 };
+
+- create operations index with their corresponding function calls (commands to functions)
+
+these are for operations from the userspace TO the kernel
+
+321 static struct genl_ops dropmon_ops[] = {
+322         {
+323                 .cmd = NET_DM_CMD_CONFIG,
+324                 .doit = net_dm_cmd_config,
+325         },
+326         {
+327                 .cmd = NET_DM_CMD_START,
+328                 .doit = net_dm_cmd_trace,
+329         },
+330         {
+331                 .cmd = NET_DM_CMD_STOP,
+332                 .doit = net_dm_cmd_trace,
+333         },
+334 };
+
+- register family and operations on the family (commands and their attributes)
+
+
+352         rc = genl_register_family_with_ops(&net_drop_monitor_family,
+353                                            dropmon_ops,
+354                                            ARRAY_SIZE(dropmon_ops));
+
+- single function can support multiple command:
+
+267 static int net_dm_cmd_trace(struct sk_buff *skb,
+268                         struct genl_info *info)
+269 {
+270         switch (info->genlhdr->cmd) {
+271         case NET_DM_CMD_START:
+272                 return set_all_monitor_traces(TRACE_ON);
+273                 break;
+274         case NET_DM_CMD_STOP:
+275                 return set_all_monitor_traces(TRACE_OFF);
+276                 break;
+277         }
+278 
+279         return -ENOTSUPP;
+280 }
+
+- on exit, we unregister the family
+
+379 out_unreg:
+380         genl_unregister_family(&net_drop_monitor_family);
+
+- a group numeric identifier is also exported from the include/linux/net_dropmon.h header:
+
+ 63 #define NET_DM_GRP_ALERT 1
+
+- sending is done here to the specific NET_DM_GRP_ALERT:
+
+ 96 static void send_dm_alert(struct work_struct *unused)
+[...]
+114         genlmsg_multicast(skb, 0, NET_DM_GRP_ALERT, GFP_KERNEL);
+115 
+116 }	
+
+== drop_monitor work queue ==
+
+- a generic data structure holds data per cpu:
+
+ 47 struct per_cpu_dm_data {
+ 48         struct work_struct dm_alert_work;
+ 49         struct sk_buff *skb;
+ 50         atomic_t dm_hit_count;
+ 51         struct timer_list send_timer;
+ 52 };
+
+* a generic Linux workqueue work structure:
+
+http://tomoyo.sourceforge.jp/cgi-bin/lxr/source/include/linux/workqueue.h#L17
+
+* a common genetlink socket buffer allocated per cpu:
+
+ 87         data->skb = genlmsg_new(al, GFP_KERNEL);
+
+* a list of timers init'ed here:
+
+372                 init_timer(&data->send_timer);
+373                 data->send_timer.data = cpu;
+374                 data->send_timer.function = sched_send_work;
+
+* ...and scheduled here:
+
+166         if (!timer_pending(&data->send_timer)) {
+167                 data->send_timer.expires = jiffies + dm_delay * HZ;
+168                 add_timer_on(&data->send_timer, smp_processor_id());
+169         }
+
+
+* this is initially put in a workqueue initialized as follows:
+
+371                 INIT_WORK(&data->dm_alert_work, send_dm_alert);
+
+
+* the notification message to the userspace is created and set everytime we send out an alert:
+
+ 87         data->skb = genlmsg_new(al, GFP_KERNEL);
+ 88         genlmsg_put(data->skb, 0, 0, &net_drop_monitor_family,
+ 89                         0, NET_DM_CMD_ALERT);
+ 90         nla = nla_reserve(data->skb, NLA_UNSPEC, sizeof(struct net_dm_alert_msg));
+ 91         msg = nla_data(nla);
+ 92         memset(msg, 0, al);
+
+== Calls to genlmsg_multicast ==
+
+*  genlmsg_multicast
+** send_dm_alert
+*** (inserted in workqueue)
+
+separetely, a timer continously executes the wor:
+
+**** schedule_work(&data->dm_alert_work);
+***** sched_send_work
+****** (timer function)
+******* (timer scheduled up)
+
+== Usage example ==
+
+https://fedorahosted.org/dropwatch/browser/src/main.c?rev=217a4a24667a7c248562f19e28766f8746ff4ff1
+
+after resolving family, we connect to a socket that has joined the relevant group exposed by the kernel
+
+128	        sd = nl_handle_alloc();
+129	        nl_join_groups(sd, NET_DM_GRP_ALERT);
+130	
+131	        nl_connect(sd, NETLINK_GENERIC);
+
+examples don't use genl specific functions, but lower-level nl functions.
+
+
+			
+	
+http://tomoyo.sourceforge.jp/cgi-bin/lxr/source/include/net/netlink.h#L605		
+
+605 static inline int nlmsg_multicast(struct sock *sk, struct sk_buff *skb,
+606                                   u32 pid, unsigned int group, gfp_t flags)
+607 {
+608         int err;
+609 
+610         NETLINK_CB(skb).dst_group = group;
+611 
+612         err = netlink_broadcast(sk, skb, pid, group, flags);
+613         if (err > 0)
+614                 err = 0;
+615 
+616         return err;
+617 }
+
+http://tomoyo.sourceforge.jp/cgi-bin/lxr/source/net/netlink/af_netlink.c#L982
+1043 int netlink_broadcast_filtered(struct sock *ssk, struct sk_buff *skb, u32 pid,
+1044         u32 group, gfp_t allocation,
+1045         int (*filter)(struct sock *dsk, struct sk_buff *skb, void *data),
+1046         void *filter_data)
+1047 {
+1048         struct net *net = sock_net(ssk);
+1049         struct netlink_broadcast_data info;
+1050         struct hlist_node *node;
+1051         struct sock *sk;
+1052 
+1053         skb = netlink_trim(skb, allocation);
+1054 
+1055         info.exclude_sk = ssk;
+1056         info.net = net;
+1057         info.pid = pid;
+1058         info.group = group;
+1059         info.failure = 0;
+1060         info.delivery_failure = 0;
+1061         info.congested = 0;
+1062         info.delivered = 0;
+1063         info.allocation = allocation;
+1064         info.skb = skb;
+1065         info.skb2 = NULL;
+1066         info.tx_filter = filter;
+1067         info.tx_data = filter_data;
+1068 
+1069         /* While we sleep in clone, do not allow to change socket list */
+1070 
+1071         netlink_lock_table();
+1072 
+1073         sk_for_each_bound(sk, node, &nl_table[ssk->sk_protocol].mc_list)
+1074                 do_one_broadcast(sk, &info);
+1075 
+1076         consume_skb(skb);
+1077 
+1078         netlink_unlock_table();
+1079 
+1080         if (info.delivery_failure) {
+1081                 kfree_skb(info.skb2);
+1082                 return -ENOBUFS;
+1083         } else
+1084                 consume_skb(info.skb2);
+1085 
+1086         if (info.delivered) {
+1087                 if (info.congested && (allocation & __GFP_WAIT))
+1088                         yield();
+1089                 return 0;
+1090         }
+1091         return -ESRCH;
+1092 }
+
+...so this system error message:
+
+http://tomoyo.sourceforge.jp/cgi-bin/lxr/source/include/asm-generic/errno-base.h#L6
+  6 #define ESRCH            3      /* No such process */
+
+...matches info.delivered being false (but not info.delivery_failure...)
+
+
+= crypto =
+
+http://tomoyo.sourceforge.jp/cgi-bin/lxr/source/crypto/crypto_user.c
+http://tomoyo.sourceforge.jp/cgi-bin/lxr/source/include/linux/cryptouser.h
+
+== commands ==
+
+
+ 22 enum {
+ 23         CRYPTO_MSG_BASE = 0x10,
+ 24         CRYPTO_MSG_NEWALG = 0x10,
+ 25         CRYPTO_MSG_DELALG,
+ 26         CRYPTO_MSG_UPDATEALG,
+ 27         CRYPTO_MSG_GETALG,
+ 28         __CRYPTO_MSG_MAX
+ 29 };
+ 30 #define CRYPTO_MSG_MAX (__CRYPTO_MSG_MAX - 1)
+ 31 #define CRYPTO_NR_MSGTYPES (CRYPTO_MSG_MAX + 1 - CRYPTO_MSG_BASE)
+
+== attributes ==
+
+ 35 /* Netlink message attributes.  */
+ 36 enum crypto_attr_type_t {
+ 37         CRYPTOCFGA_UNSPEC,
+ 38         CRYPTOCFGA_PRIORITY_VAL,        /* __u32 */
+ 39         CRYPTOCFGA_REPORT_LARVAL,       /* struct crypto_report_larval */
+ 40         CRYPTOCFGA_REPORT_HASH,         /* struct crypto_report_hash */
+ 41         CRYPTOCFGA_REPORT_BLKCIPHER,    /* struct crypto_report_blkcipher */
+ 42         CRYPTOCFGA_REPORT_AEAD,         /* struct crypto_report_aead */
+ 43         CRYPTOCFGA_REPORT_COMPRESS,     /* struct crypto_report_comp */
+ 44         CRYPTOCFGA_REPORT_RNG,          /* struct crypto_report_rng */
+ 45         CRYPTOCFGA_REPORT_CIPHER,       /* struct crypto_report_cipher */
+ 46         __CRYPTOCFGA_MAX
+ 47 
+ 48 #define CRYPTOCFGA_MAX (__CRYPTOCFGA_MAX - 1)
+
+== sending ==
+
+215         return nlmsg_unicast(crypto_nlsk, skb, NETLINK_CB(in_skb).pid);
+
+== registration ==
+
+417         crypto_nlsk = netlink_kernel_create(&init_net, NETLINK_CRYPTO,
+418                                             0, crypto_netlink_rcv,
+419                                             NULL, THIS_MODULE);
+
+= IrDA netlink layer =
+
+http://tomoyo.sourceforge.jp/cgi-bin/lxr/source/net/irda/irnetlink.c
+http://tomoyo.sourceforge.jp/cgi-bin/lxr/source/include/linux/irda.h
+
+== commands and attributes ==
+
+http://tomoyo.sourceforge.jp/cgi-bin/lxr/source/include/linux/irda.h
+
+221 #define IRDA_NL_NAME "irda"
+222 #define IRDA_NL_VERSION 1
+223 
+224 enum irda_nl_commands {
+225         IRDA_NL_CMD_UNSPEC,
+226         IRDA_NL_CMD_SET_MODE,
+227         IRDA_NL_CMD_GET_MODE,
+228 
+229         __IRDA_NL_CMD_AFTER_LAST
+230 };
+231 #define IRDA_NL_CMD_MAX (__IRDA_NL_CMD_AFTER_LAST - 1)
+232 
+233 enum nl80211_attrs {
+234         IRDA_NL_ATTR_UNSPEC,
+235         IRDA_NL_ATTR_IFNAME,
+236         IRDA_NL_ATTR_MODE,
+237 
+238         __IRDA_NL_ATTR_AFTER_LAST
+239 };
+240 #define IRDA_NL_ATTR_MAX (__IRDA_NL_ATTR_AFTER_LAST - 1)
+
+== family ==
+
+ 27 static struct genl_family irda_nl_family = {
+ 28         .id = GENL_ID_GENERATE,
+ 29         .name = IRDA_NL_NAME,
+ 30         .hdrsize = 0,
+ 31         .version = IRDA_NL_VERSION,
+ 32         .maxattr = IRDA_NL_CMD_MAX,
+ 33 };
+
+== receiver policy ==
+
+128 static const struct nla_policy irda_nl_policy[IRDA_NL_ATTR_MAX + 1] = {
+129         [IRDA_NL_ATTR_IFNAME] = { .type = NLA_NUL_STRING,
+130                                   .len = IFNAMSIZ-1 },
+131         [IRDA_NL_ATTR_MODE] = { .type = NLA_U32 },
+132 };
+
+== registration ==
+
+152         return genl_register_family_with_ops(&irda_nl_family,
+153                 irda_nl_ops, ARRAY_SIZE(irda_nl_ops));
+
+== ops ==
+
+134 static struct genl_ops irda_nl_ops[] = {
+135         {
+136                 .cmd = IRDA_NL_CMD_SET_MODE,
+137                 .doit = irda_nl_set_mode,
+138                 .policy = irda_nl_policy,
+139                 .flags = GENL_ADMIN_PERM,
+140         },
+141         {
+142                 .cmd = IRDA_NL_CMD_GET_MODE,
+143                 .doit = irda_nl_get_mode,
+144                 .policy = irda_nl_policy,
+145                 /* can be retrieved by unprivileged users */
+146         },
+147 
+148 };

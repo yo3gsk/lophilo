@@ -1,0 +1,111 @@
+= compiling v8 from source =
+
+apt-get install git git-svn
+
+= rebuilding v8 statically =
+
+cd node/deps/v8
+
+ scons arch=arm armeabi=soft wordsize=32 snapshot=off library=static mode=release
+
+cd node/
+./configure --prefix=$HOME/node-builds/arm-Linux --dest-cpu=arm --openssl-use-sys=OPENSSL_USE_SYS --without-snapshot --without-ssl
+
+
+= remaining file with v7 =
+
+out/Release/obj.target/uv/deps/uv/src/uv-common.o
+
+= bug =
+
+every input object is v4T:
+
+find ./ -name "*.[ao]" -print -exec readelf -A {} \;  | egrep "(Tag_CPU_arch:)" | grep -v v4T
+
+using the C++ compiler --sysroot= parameter and the linker --syslibroot= parameter
+
+the linker still manages to generate a v7 executable:
+
+rngadam@cnshaqs10:~/node$ readelf -A node
+Attribute Section: aeabi
+File Attributes
+  Tag_CPU_name: "7-A"
+  Tag_CPU_arch: v7
+  Tag_CPU_arch_profile: Application
+  Tag_ARM_ISA_use: Yes
+  Tag_THUMB_ISA_use: Thumb-2
+  Tag_FP_arch: VFPv3-D16
+  Tag_ABI_PCS_wchar_t: 4
+  Tag_ABI_FP_denormal: Needed
+  Tag_ABI_FP_exceptions: Needed
+  Tag_ABI_FP_number_model: IEEE 754
+  Tag_ABI_align_needed: 8-byte
+  Tag_ABI_align_preserved: 8-byte, except leaf SP
+  Tag_ABI_enum_size: int
+  Tag_ABI_HardFP_use: SP and DP
+  Tag_DIV_use: Not allowed
+
+MORE:
+
+http://lists.debian.org/debian-arm/2011/11/msg00046.html
+
+Please do not install Ubuntu cross toolchain in Debian systems. It is
+armv7a by default and will not change. You should install toolchain from
+Emdebian.org repository instead.
+
+EXPECTED:
+
+When all parameters set correctly, should be able to generate arbitrary platform binaries.
+
+= ldr fail =
+
+root@mini2440:~# gdb ./node/node
+
+(gdb) run
+Program received signal SIGILL, Illegal instruction.
+0x00117d48 in _start ()
+(gdb) bt
+#0  0x00117d48 in _start ()
+(gdb)  x/1xw 0x5fee4
+1i 0x5fee40x5fee4:      0x65646f6e
+(gdb)     x/1i 0x5fee4
+0x5fee4:        ldr     r6, [r5, #116]  ; 0x74
+
+...the platform parameters were not set for the compiler...
+
+= same location, different error =
+
+root@mini2440:~# gdb ./node/node
+(gdb)  x/1xw 0x5fee4
+0x5fee4:        0x65646f6e
+(gdb)   x/1i 0x5fee4
+0x5fee4:        strbvs  r6, [r4, #-3950]!       ; 0xf6e
+
+
+= TODO =
+
+recompile toolchain, glibc, use tmpfs instead of going everything to NFS
+
+
+= compiling node =
+
+export ARCH=arm
+export CXX=arm-linux-gnueabi-g++
+export CXXFLAGS="-msoft-float -D__GCC_FLOAT_NOT_NEEDED  -march=armv4t -mtune=arm920t -mno-thumb-interwork -mno-thumb"
+export CFLAGS="$CXXFLAGS"
+export CPPFLAGS="$CXXFLAGS"
+export CC=arm-linux-gnueabi-gcc
+export LDFLAGS="$CXXFLAGS -L/home/rngadam/friendlyarm/opt/FriendlyARM/toolschain/4.4.3/arm-none-linux-gnueabi/sys-root/usr/lib -L/home/rngadam/friendlyarm/opt/FriendlyARM/toolschain/4.4.3/arm-none-linux-gnueabi/sys-root/lib/"
+
+scons arch=arm armeabi=soft wordsize=32 snapshot=off library=static mode=release
+
+= final compilation results in non-v4t = 
+
+rngadam@cnshaqs10:~/node/deps/v8$ readelf -A *.so | grep CPU_arch
+  Tag_CPU_arch: v7
+  Tag_CPU_arch_profile: Application
+  Tag_CPU_arch: v7
+  Tag_CPU_arch_profile: Application
+
+	arm-linux-gnueabi-g++ $CXXFLAGS -o libv8preparser.so -shared obj/release/allocation.os obj/release/bignum-dtoa.os obj/release/bignum.os obj/release/cached-powers.os obj/release/conversions.os obj/release/diy-fp.os obj/release/dtoa.os obj/release/fast-dtoa.os obj/release/fixed-dtoa.os obj/release/hashmap.os obj/release/preparse-data.os obj/release/preparser-api.os obj/release/preparser.os obj/release/scanner.os obj/release/strtod.os obj/release/token.os obj/release/unicode.os obj/release/utils.os -lpthread
+

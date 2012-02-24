@@ -1,0 +1,6 @@
+
+= TODO =
+
+- build toolchain
+- build glibc
+- use tmpfs instead of going everything to NFS
