@@ -14,5 +14,5 @@ observer: observer.c Makefile liblophilo
 	gcc -g observer.c -L. -llophilo -lnl-genl -lnl -o observer
 
 liblophilo: client.c client.h
-	gcc -g -c client.c -o client.o
+	gcc -static -g -c client.c -o client.o
 	ar rcs liblophilo.a client.o

@@ -10,6 +10,11 @@ def configure(conf):
   conf.check_tool('node_addon')
 
 def build(bld):
+  bld.env.append_value('LINKFLAGS', '-L../../../kmod') 
+  bld.env.append_value('LINKFLAGS', '-llophilo') 
+  bld.env.append_value('LINKFLAGS', '-lnl') 
+  bld.env.append_value('LINKFLAGS', '-lnl-genl') 
+  bld.env.append_value('CXXFLAGS', '-I../../../kmod') 
   obj = bld.new_task_gen('cxx', 'shlib', 'node_addon')
   obj.target = 'lophilo'
   obj.source = ['lophilo.cc']
