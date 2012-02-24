@@ -1,0 +1,17 @@
+= INITIAL SETUP =
+
+This was from the initial git directory:
+
+git clone --bare /home/rngadma/lophilo/.git/ /home/rngadam/lophilo.git
+
+= SETUP =
+
+From other machines (after adding your public key to ~/.ssh/authorized_keys)
+
+git remote add cnshaqs10 ssh://cnshaqs10/~/lophilo.git
+git config --global user.email rngadam@lophilo.com
+
+= DAY-TO-DAY =
+
+git push cnshaqs10
+git pull cnshaqs10
