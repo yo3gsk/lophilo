@@ -1,0 +1,9 @@
+#!/bin/sh
+LINK_NAME="/tftpboot/0AEC0A91.img"
+if [ ! -f "$1" ]; then
+	echo "no such image"
+	exit 1
+fi
+
+rm $LINK_NAME
+ln -s $1 $LINK_NAME
