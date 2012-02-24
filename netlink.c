@@ -37,7 +37,7 @@ static struct genl_family lophilo_family = {
 
 static pid_t sender_pid = 0;
 struct net * sender_net;
-static int sequence = 0;
+static unsigned long sequence = 0;
 
 static int lophilo_register(struct sk_buff *skb, struct genl_info *info)
 {
