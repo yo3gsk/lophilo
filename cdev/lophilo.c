@@ -38,14 +38,22 @@ static struct lophilo_data* loldata;
 static DEFINE_KFIFO(messages, int, FIFO_SIZE);
 wait_queue_head_t fifo_wq; 
 
+static int dir = 1;
+
 void my_timer_callback( unsigned long data )
 {
 	if(loldata) {
-		loldata->p0++;
+		loldata->p0 += dir;
+		if(loldata->p0 > 359) {
+			dir = -1;
+		}
+		if(loldata->p0 < -359) {
+			dir = 1;
+		}
 		kfifo_put(&messages, &(loldata->p0));
 		wake_up_interruptible(&fifo_wq);
 	}
-	if(mod_timer(&my_timer, jiffies + msecs_to_jiffies(1000))) {
+	if(mod_timer(&my_timer, jiffies + msecs_to_jiffies(10))) {
 		printk(KERN_INFO "Unable to reset timer");
 	}
 } 

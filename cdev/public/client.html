@@ -1,0 +1,27 @@
+<html>
+<head>
+<script type="text/javascript" src="/smoothie.js"></script>
+<script src='http://localhost:8001/socket.io/socket.io.js'></script>
+<script>
+	var time_series = new TimeSeries();
+	var socket = io.connect('http://localhost:8001');
+	socket.on('lophilo', function (data) {
+		//console.log(data['counter']);
+		document.getElementById('counter').innerHTML = data['counter'];
+		if((data['counter'] % 10) == 0)
+			time_series.append(new Date().getTime(), data['counter']);
+		//socket.emit('lophilo', { my: 'data' });
+	});
+      
+      function createTimeline() {
+        var chart = new SmoothieChart();
+        chart.addTimeSeries(time_series, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 4 });
+        chart.streamTo(document.getElementById("chart"), 1000);
+      }
+</script>
+</head>
+<body onload="createTimeline()" style="background-color:#333333">
+	<canvas id="chart" width="500" height="250"></canvas>
+	<b id='counter'>dude</b>
+</body>
+</html>
