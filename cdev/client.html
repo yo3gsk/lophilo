@@ -1,0 +1,14 @@
+<html>
+<head>
+<script src='http://localhost:8001/socket.io/socket.io.js'></script>
+<script>
+	var socket = io.connect('http://localhost:8001');
+	socket.on('lophilo', function (data) {
+		//console.log(data['counter']);
+		document.getElementById('counter').innerHTML = data['counter'];
+		//socket.emit('lophilo', { my: 'data' });
+	});
+</script>
+</head>
+<b id='counter'>dude</b>
+</html>
