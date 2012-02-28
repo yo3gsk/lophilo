@@ -18,7 +18,7 @@ int main(void)
   close(fd);
   if(data != (struct lophilo_data*)-1) {
 	  printf("reading from %p\n", data);
-	  printf("%d\n", data->p0);
+	  printf("%d\n", data->updates[LOPHILO_PIN_XA0].value);
 	  munmap(data, sizeof(struct lophilo_data));
   }
   return 0;

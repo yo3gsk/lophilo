@@ -1,16 +1,32 @@
 <html>
 <head>
 <script type="text/javascript" src="/smoothie.js"></script>
-<script src='http://localhost:8001/socket.io/socket.io.js'></script>
+<script type="text/javascript" src="http://localhost:8001/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="http://jsxt.googlecode.com/svn/trunk/js/String.js"></script>
 <script>
+	function process_data(data) {
+		//console.log(data['timestamp']);
+		if(data['source'] == lophilo_configuration['last_update_usec_id']) {
+			last_update_usec = data['value'];
+			document.getElementById('timestamp').innerHTML = '%d.%06d'.sprintf(last_update_sec, last_update_usec);
+		} else if(data['source'] == lophilo_configuration['last_update_sec_id']) {
+			last_update_sec = data['value'];
+			document.getElementById('timestamp').innerHTML = '%d.%06d'.sprintf(last_update_sec, last_update_usec);
+		} else if(data['source'] == lophilo_configuration['pin_xa0_id']) {
+			//time_series.append(last_update_sec*1000, data['value']);
+		}
+		//socket.emit('lophilo', { my: 'data' });
+	}
 	var time_series = new TimeSeries();
 	var socket = io.connect('http://localhost:8001');
-	socket.on('lophilo', function (data) {
-		//console.log(data['counter']);
-		document.getElementById('counter').innerHTML = data['counter'];
-		if((data['counter'] % 10) == 0)
-			time_series.append(new Date().getTime(), data['counter']);
-		//socket.emit('lophilo', { my: 'data' });
+        var last_update_sec = 0;
+        var last_update_usec = 0;
+        var lophilo_configuration;
+	socket.on('lophilo_configuration', function (data) {
+		lophilo_configuration = data;
+	});
+	socket.on('lophilo_update', function (data) {
+		data.forEach(process_data);
 	});
       
       function createTimeline() {
@@ -22,6 +38,6 @@
 </head>
 <body onload="createTimeline()" style="background-color:#333333">
 	<canvas id="chart" width="500" height="250"></canvas>
-	<b id='counter'>dude</b>
+	<b id='timestamp'>dude</b>
 </body>
 </html>

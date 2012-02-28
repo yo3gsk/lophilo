@@ -6,6 +6,7 @@
 #include <linux/fs.h>
 #include <linux/mm.h>
 #include <linux/timer.h>
+#include <linux/jiffies.h> // jiffies_to_usecs
 #include <asm/uaccess.h>
 #include <linux/slab.h>
 #include <linux/kfifo.h> // kfifo_put, kfifo_to_user, etc...
@@ -34,23 +35,30 @@ struct file_operations map_fops =
 static struct timer_list my_timer;
 static struct lophilo_data* loldata;
 
-#define FIFO_SIZE       32
-static DEFINE_KFIFO(messages, int, FIFO_SIZE);
+static DEFINE_KFIFO(updates, lophilo_update_t, LOPHILO_FIFO_SIZE);
 wait_queue_head_t fifo_wq; 
 
 static int dir = 1;
 
 void my_timer_callback( unsigned long data )
 {
+	struct timeval tv;
 	if(loldata) {
-		loldata->p0 += dir;
-		if(loldata->p0 > 359) {
+		loldata->updates[LOPHILO_PIN_XA0].value += dir;
+		if(loldata->updates[LOPHILO_PIN_XA0].value > 359) {
 			dir = -1;
 		}
-		if(loldata->p0 < -359) {
+		if(loldata->updates[LOPHILO_PIN_XA0].value == 0) {
 			dir = 1;
 		}
-		kfifo_put(&messages, &(loldata->p0));
+		
+		do_gettimeofday(&tv);
+		//printk("tv_sec: %ld tv_usec: %ld", tv.tv_sec, tv.tv_usec);
+		loldata->updates[LOPHILO_LAST_UPDATE_SEC].value = tv.tv_sec;
+		loldata->updates[LOPHILO_LAST_UPDATE_USEC].value = tv.tv_usec;
+		kfifo_put(&updates, &(loldata->updates[LOPHILO_LAST_UPDATE_SEC]));
+		kfifo_put(&updates, &(loldata->updates[LOPHILO_LAST_UPDATE_USEC]));
+		kfifo_put(&updates, &(loldata->updates[LOPHILO_PIN_XA0]));
 		wake_up_interruptible(&fifo_wq);
 	}
 	if(mod_timer(&my_timer, jiffies + msecs_to_jiffies(10))) {
@@ -80,7 +88,7 @@ static unsigned int poll_lophilo(struct file *filp, poll_table *wait)
 {
 	unsigned int mask = 0;
 	poll_wait(filp, &fifo_wq, wait);
-	if(kfifo_len(&messages)) {
+	if(kfifo_len(&updates)) {
 		mask |= POLLIN | POLLRDNORM;
 	}
 	mask |= POLLOUT | POLLWRNORM;
@@ -92,15 +100,15 @@ static int read_lophilo(struct file *filp, char __user *buf, size_t count, loff_
 {
 	int ret;
 	unsigned int copied;
-	if(!kfifo_len(&messages)) {
+	if(!kfifo_len(&updates)) {
 		if(filp->f_flags & O_NONBLOCK) 
 			return -EAGAIN;
 	        /* Blocking read.  Block if no data available */
 	        else {
-			wait_event_interruptible(fifo_wq,  kfifo_len(&messages));
+			wait_event_interruptible(fifo_wq,  kfifo_len(&updates));
 		}
 	}
-	ret = kfifo_to_user(&messages, buf, count, &copied);
+	ret = kfifo_to_user(&updates, buf, count, &copied);
 	if(ret < 0)
 		printk("Error reading fifo %d\n", ret);
 	return ret ? ret : copied;
@@ -116,14 +124,19 @@ lophilo_init(void)
 		printk("unable to allocate with kmalloc");
 		return -EBUSY;
 	}
-	loldata->p0 = 0;
+	loldata->updates[LOPHILO_LAST_UPDATE_SEC].source = LOPHILO_LAST_UPDATE_SEC; 
+	loldata->updates[LOPHILO_LAST_UPDATE_SEC].value = 0;
+	loldata->updates[LOPHILO_LAST_UPDATE_USEC].source = LOPHILO_LAST_UPDATE_USEC; 
+	loldata->updates[LOPHILO_LAST_UPDATE_USEC].value = 0;
+	loldata->updates[LOPHILO_PIN_XA0].source = LOPHILO_PIN_XA0; 
+	loldata->updates[LOPHILO_PIN_XA0].value = 0;
 
 	setup_timer( &my_timer, my_timer_callback, 0 );
 	printk( "Starting timer to fire in 200ms (%ld)\n", jiffies );
 	ret = mod_timer( &my_timer, jiffies + msecs_to_jiffies(200) );
 
 	init_waitqueue_head(&(fifo_wq));
-	INIT_KFIFO(messages);
+	INIT_KFIFO(updates);
 
 	if (register_chrdev(MAP_MAJOR,"map", &map_fops) <0 ) 
 	{

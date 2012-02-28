@@ -25,10 +25,10 @@ enum lophilo_sources_types {
 
 enum lophilo_sources {
 	LOPHILO_PIN_UNSPEC,
+	LOPHILO_TIME_USEC,
 	LOPHILO_PIN_XA0,
         __LOPHILO_PIN_MAX,
 };
-
 
 enum update_attributes {
 	LOPHILO_U_UNSPEC,
