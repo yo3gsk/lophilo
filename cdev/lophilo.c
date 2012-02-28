@@ -43,6 +43,9 @@ static int dir = 1;
 void my_timer_callback( unsigned long data )
 {
 	struct timeval tv;
+	if(mod_timer(&my_timer, jiffies + msecs_to_jiffies(10))) {
+		printk(KERN_INFO "Unable to reset timer");
+	}
 	if(loldata) {
 		loldata->updates[LOPHILO_PIN_XA0].value += dir;
 		if(loldata->updates[LOPHILO_PIN_XA0].value > 359) {
@@ -60,9 +63,6 @@ void my_timer_callback( unsigned long data )
 		kfifo_put(&updates, &(loldata->updates[LOPHILO_LAST_UPDATE_USEC]));
 		kfifo_put(&updates, &(loldata->updates[LOPHILO_PIN_XA0]));
 		wake_up_interruptible(&fifo_wq);
-	}
-	if(mod_timer(&my_timer, jiffies + msecs_to_jiffies(10))) {
-		printk(KERN_INFO "Unable to reset timer");
 	}
 } 
 

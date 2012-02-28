@@ -13,7 +13,16 @@
 			last_update_sec = data['value'];
 			document.getElementById('timestamp').innerHTML = '%d.%06d'.sprintf(last_update_sec, last_update_usec);
 		} else if(data['source'] == lophilo_configuration['pin_xa0_id']) {
-			//time_series.append(last_update_sec*1000, data['value']);
+			timestamp_ms = last_update_sec*1000+last_update_usec/1000;
+			value = data['value'];
+			time_series.append(timestamp_ms, value);
+			if(last_value != 0)
+				skipped += Math.abs(Math.abs(last_value) - Math.abs(value)) - 1;
+			datapoints++;
+			document.getElementById('skipped').innerHTML = ((skipped/(skipped+datapoints))*100).toFixed(1);
+			document.getElementById('pps').innerHTML = (datapoints/((timestamp_ms - start_time + 1)/1000)).toFixed(1);
+			last_value = value;
+
 		}
 		//socket.emit('lophilo', { my: 'data' });
 	}
@@ -22,22 +31,34 @@
         var last_update_sec = 0;
         var last_update_usec = 0;
         var lophilo_configuration;
+	var start_time = 0;
+	var datapoints = 0;
+	var skipped = 0;
+	var last_value = 0;
+	socket.on('connection', function(data) {
+		alert('connected!');
+	});
 	socket.on('lophilo_configuration', function (data) {
 		lophilo_configuration = data;
+		pps = 0;
+		start_time = new Date().getTime();
 	});
 	socket.on('lophilo_update', function (data) {
 		data.forEach(process_data);
 	});
       
       function createTimeline() {
-        var chart = new SmoothieChart();
-        chart.addTimeSeries(time_series, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 4 });
+        var chart = new SmoothieChart({fps: 100, minValue: 0, maxValue: 360, interpolation: 'line', millisPerPixel: 10});
+        chart.addTimeSeries(time_series, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 1 });
         chart.streamTo(document.getElementById("chart"), 1000);
       }
 </script>
 </head>
 <body onload="createTimeline()" style="background-color:#333333">
-	<canvas id="chart" width="500" height="250"></canvas>
-	<b id='timestamp'>dude</b>
+	<canvas id="chart" width="800" height="250"></canvas>
+	<br><center><b id='timestamp'>loading</b></center>
+	<br><center>data points per second: <b id='pps'>loading</b></center>
+	<br><center>skipped <b id='skipped'>loading</b>%</center>
+	<br><center>one pixel = 10ms, one line = 1s </center>
 </body>
 </html>
