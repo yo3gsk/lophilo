@@ -1,0 +1,52 @@
+LophiloEventWrap: public HandleWrap
+
+in Start:
+
+int r = uv_fs_event_init(uv_default_loop(), &wrap->handle_, *path, OnEvent, 0);
+
+in Registration:
+
+FSEventWrap::OnEvent(uv_fs_event_t* handle, const char* filename,
+
+LophiloWrap -> GeNetlinkWrap -> uv_genetlink
+
+LophiloWrap 
+-shared enums with netlink
+
+GeNetlinkWrap 
+
+uv_genetlink
+
+libuv: src/unix/genetlink.c
+
+uv_genetlink_t
+
+https://github.com/joyent/libuv/blob/master/src/unix/stream.c
+
+int uv__stream_open(uv_stream_t* stream, int fd, int flags) {
+
+
+
+= tcpwrap =
+
+
+
+https://github.com/joyent/node/blob/master/src/tcp_wrap.cc
+
+Handle<Value> TCPWrap::Bind(const Arguments& args) {
+[...]
+	int r = uv_tcp_bind(&wrap->handle_, address)
+
+https://github.com/joyent/node/blob/master/src/tcp_wrap.h
+
+
+https://github.com/joyent/libuv/blob/master/src/uv-common.h
+
+int uv__tcp_bind(uv_tcp_t* handle, struct sockaddr_in addr);
+
+https://github.com/joyent/libuv/blob/master/src/unix/tcp.c
+
+= fs.watchFile(filename, [options], listener) =
+
+fs.watchFile(filename, [options], listener)
+
