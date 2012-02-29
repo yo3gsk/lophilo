@@ -1,0 +1,1 @@
+dvtm "itop -a" htop "sudo iftop" "sudo tail -f /var/log/*.log"
