@@ -1,0 +1,75 @@
+ 	
+LENNY
+
+setenv bootargs console=ttySAC0,115200 ip=dhcp noinitrd init=/bin/sh root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/armel-lenny nfsrootdebug debug
+
+kernel: drivers/tty/serial/samsung*
+qemu: hw/mini2440.c
+rootfs: /etc/inittab
+
+S:2345:respawn:/sbin/getty 115200 ttySAC0
+
+alternate name: s3c2410_serial0 
+
+hardware interface: http://www.friendlyarm.net/forum/topic/1580
+
+compiling kernel 2.6: http://wiki.linuxmce.org/index.php/Mini2440#Kernel
+
+Serial: 8250/16550 driver, 4 ports, IRQ sharing enabled
+s3c2440-uart.0: ttySAC0 at MMIO 0x50000000 (irq = 70) is a S3C2440
+console [ttySAC0] enabled
+s3c24xx_serial_probe(c05192f0) 1
+s3c24xx_serial_probe: initialising port c0527058...
+s3c24xx_serial_init_port: port=c0527078, platdev=c05192f0
+resource c051516c (50004000..50007fff)
+port: map=50004000, mem=f7004000, irq=73 (73,74), clock=1
+s3c24xx_serial_probe: adding port
+s3c2440-uart.1: ttySAC1 at MMIO 0x50004000 (irq = 73) is a S3C2440
+s3c24xx_serial_probe(c05193dc) 2
+s3c24xx_serial_probe: initialising port c0527120...
+s3c24xx_serial_init_port: port=c0527140, platdev=c05193dc
+resource c05151a4 (50008000..5000bfff)
+port: map=50008000, mem=f7008000, irq=76 (76,77), clock=1
+s3c24xx_serial_probe: adding port
+s3c2440-uart.2: ttySAC2 at MMIO 0x50008000 (irq = 76) is a S3C2440
+[...]
+s3c24xx_serial_startup: port=50000000 (f7000000,c05272b0)
+requesting tx irq...
+s3c24xx_serial_startup ok
+udivslot = 54aa (div 7)
+config: 8bits/char
+setting ulcon to 00000003, brddiv to 26, udivslot 000054aa
+s3c_uart_write: Bad register 0x2c
+uart: ulcon = 0x00000003, ucon = 0x00000385, ufcon = 0x00000011
+
+/home/rngadam/friendlyarm/opt/FriendlyARM/toolschain/4.4.3/bin/arm-none-linux-gnueabi-
+
+
+== console ==
+
+One way to ensure a working console (since the console= paramters in
+cmdline seems to work) is to add the following line into your
+/etc/inittab:
+
+::respawn:-/bin/sh
+
+That will open up /bin/sh directly on the same console already in use
+by the kernel.
+
+
+== modules ==
+make -j4 modules
+make modules_install INSTALL_MOD_PATH=/exports/mini2440/armel-lenny
+
+http://www.freshblurbs.com/install-node-js-and-express-js-nginx-debian-lenny
+
+http://code.google.com/p/mini6410-debian/wiki/Tutorial
+
+
+export PATH=$PATH:/home/rngadam/uboot/tools/
+make -j4 uImage
+cp arch/arm/boot/uImage /tftpboot/uImage-Linux-3.3-rc1-dirty-clean
+~/bin/img /tftpboot/uImage-Linux-3.3-rc1-dirty-clean
+make -j4 modules_install INSTALL_MOD_PATH=/exports/mini2440/armel-squeeze
+
+setenv bootargs console=ttySAC0,115200 ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/armel-squeeze nfsrootdebug

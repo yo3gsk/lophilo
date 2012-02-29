@@ -1,0 +1,53 @@
+saveenv
+dhcp
+
+setenv serverip 10.236.10.94
+setenv bootargs console=ttySAC0,115200 ip=dhcp noinitrd init=/bin/sh root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/root_fs nfsrootdebug
+dhcp
+
+
+mmcinit
+setenv serverip 10.236.10.94
+setenv bootargs console=ttySAC0,115200 noinitrd root=/dev/mmcblk0p2 rootfstype=ext3 rootwait mini2440=0tb init=/bin/sh
+dhcp
+bootm
+
+mmcinit
+setenv bootargs console=ttySAC0,115200 ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/root_fs nfsrootdebug
+bootm
+
+setenv bootargs console=ttySAC0,115200 ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/angstrom nfsrootdebug
+
+setenv bootargs console=tty0 console=ttySAC0,115200 ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/angstrom nfsrootdebug
+
+NETCONSOLE
+setenv bootargs console=tty0 console=ttySAC0,115200 ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/angstrom nfsrootdebug netconsole=5555@10.236.10.145/eth0,4444@10.236.10.94/00:e0:4d:9b:27:5e debug
+nc -l -u 4444
+
+S0
+
+setenv bootargs console=tty0 console=ttyS0,115200 ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/angstrom nfsrootdebug netconsole=5555@10.236.10.145/eth0,4444@10.236.10.94/00:e0:4d:9b:27:5e debug
+
+CLEANER
+
+setenv bootargs console=ttySAC0,115200 ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/angstrom nfsrootdebug debug
+
+BASH
+
+setenv bootargs console=ttySAC0,115200 ip=dhcp noinitrd init=/bin/sh root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/angstrom nfsrootdebug 
+
+setenv serverip 10.236.10.94
+setenv bootfile uImage/kernel-uimage
+setenv rootpath /home/rngadam/mini2440/root_fs
+setenv bootargs serial=ttySAC0 console=ttySAC0,115200 ip=10.236.10.145 noinitrd init=/sbin/init mini2440=0tb root=/dev/nfs rw nfsroot=${serverip}:/home/rngadam/mini2440/root_fs nfsrootdebug single
+saveenv
+dhcp
+
+setenv serverip 10.236.10.94
+setenv bootfile uImage/kernel-uimage
+setenv bootargs console=ttySAC0,115200 ip=dhcp noinitrd init=/bin/sh mini2440=0tb root=/dev/nfs rw nfsroot=10.236.10.94:/home/rngadam/mini2440/root_fs nfsrootdebug
+saveenv
+dhcp
+
+setenv serverip 10.236.10.94
+setenv bootargs console=ttySAC0 ip=dhcp noinitrd init=/bin/sh root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/root_fs nfsrootdebug

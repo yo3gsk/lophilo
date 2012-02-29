@@ -1,12 +1,26 @@
 = compiling v8 from source =
 
-apt-get install git git-svn
+apt-get install git git-svn scons
 
 = rebuilding v8 statically =
 
 cd node/deps/v8
 
  scons arch=arm armeabi=soft wordsize=32 snapshot=off library=static mode=release
+
+= Building node for Intel =
+
+cd node/
+./configure --prefix=~/lophilo-bin --openssl-use-sys=OPENSSL_USE_SYS
+make -j4
+
+
+= install npm packages =
+
+npm install -g socket.io --node-version 0.7.0
+npm install -g supervisor
+
+= Building node for ARM =
 
 cd node/
 ./configure --prefix=$HOME/node-builds/arm-Linux --dest-cpu=arm --openssl-use-sys=OPENSSL_USE_SYS --without-snapshot --without-ssl
@@ -82,11 +96,6 @@ root@mini2440:~# gdb ./node/node
 0x5fee4:        strbvs  r6, [r4, #-3950]!       ; 0xf6e
 
 
-= TODO =
-
-recompile toolchain, glibc, use tmpfs instead of going everything to NFS
-
-
 = compiling node =
 
 export ARCH=arm
@@ -109,3 +118,23 @@ rngadam@cnshaqs10:~/node/deps/v8$ readelf -A *.so | grep CPU_arch
 
 	arm-linux-gnueabi-g++ $CXXFLAGS -o libv8preparser.so -shared obj/release/allocation.os obj/release/bignum-dtoa.os obj/release/bignum.os obj/release/cached-powers.os obj/release/conversions.os obj/release/diy-fp.os obj/release/dtoa.os obj/release/fast-dtoa.os obj/release/fixed-dtoa.os obj/release/hashmap.os obj/release/preparse-data.os obj/release/preparser-api.os obj/release/preparser.os obj/release/scanner.os obj/release/strtod.os obj/release/token.os obj/release/unicode.os obj/release/utils.os -lpthread
 
+= error =
+
+with 0.7.5
+
+$ make
+make -C out BUILDTYPE=Release
+make[1]: Entering directory `/home/rngadam/upstream/node/out'
+  LINK(target) /home/rngadam/upstream/node/out/Release/mksnapshot
+/usr/bin/ld: cannot find -lz
+collect2: ld returned 1 exit status
+make[1]: *** [/home/rngadam/upstream/node/out/Release/mksnapshot] Error 1
+make[1]: Leaving directory `/home/rngadam/upstream/node/out'
+make: *** [node] Error 2
+
+$ find . -name "libz*"
+$ ls deps/zlib
+adler32.c   contrib  crc32.h    deflate.h  infback.c  inffast.h   inflate.c  inftrees.c  LICENSE     README.chromium  trees.h    zconf.h   zlib.h   zutil.h
+compress.c  crc32.c  deflate.c  gzio.c     inffast.c  inffixed.h  inflate.h  inftrees.h  mozzconf.h  trees.c          uncompr.c  zlib.gyp  zutil.c
+
+$ sudo apt-get install zlib1g-dev
