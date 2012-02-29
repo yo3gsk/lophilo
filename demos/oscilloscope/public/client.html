@@ -35,12 +35,11 @@
 	var datapoints = 0;
 	var skipped = 0;
 	var last_value = 0;
-	socket.on('connection', function(data) {
-		alert('connected!');
-	});
 	socket.on('lophilo_configuration', function (data) {
 		lophilo_configuration = data;
 		pps = 0;
+		datapoints = 0;
+		skipped = 0;
 		start_time = new Date().getTime();
 	});
 	socket.on('lophilo_update', function (data) {
