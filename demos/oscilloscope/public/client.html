@@ -1,7 +1,7 @@
 <html>
 <head>
 <script type="text/javascript" src="/smoothie.js"></script>
-<script type="text/javascript" src="http://localhost:8001/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="http://jsxt.googlecode.com/svn/trunk/js/String.js"></script>
 <script>
 	function process_data(data) {
@@ -27,7 +27,7 @@
 		//socket.emit('lophilo', { my: 'data' });
 	}
 	var time_series = new TimeSeries();
-	var socket = io.connect('http://localhost:8001');
+	var socket = io.connect();
         var last_update_sec = 0;
         var last_update_usec = 0;
         var lophilo_configuration;

@@ -29,7 +29,6 @@ Lophilo.prototype.watch = function(device) {
 		assert((data.length % MESSAGE_LENGTH) == 0);
 		for (var i=0; i<data.length; i += MESSAGE_LENGTH) {
 			source = data[i] | data[i+1]<<8 | data[i+2]<<16 | data[i+3]<<24;
-			//value = (data[i+4] | data[i+5]<<8 | data[i+6]<<16 | data[i+7]<<24 | data[i+8]<<32 | data[i+9]<<40 | data[i+10]<<48 | data[i+11]<<56)>>>0;
 			value = data[i+4] | data[i+5]<<8 | data[i+6]<<16 | data[i+7]<<24;
 			//console.log("source %d value %d", source, value);
 			updates.push({ 'source': source, 'value': value });
