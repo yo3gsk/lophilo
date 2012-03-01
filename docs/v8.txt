@@ -1,0 +1,9 @@
+= compiling v8 from source =
+
+apt-get install git git-svn scons
+
+= rebuilding v8 statically =
+
+cd node/deps/v8
+
+ scons arch=arm armeabi=soft wordsize=32 snapshot=off library=static mode=release

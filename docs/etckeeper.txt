@@ -1,0 +1,6 @@
+sudo apt-get install etckeeper
+sudo vi /etc/etckeeper/etckeeper.conf
+change VCS=git
+sudo etckeeper init
+sudo git commit -m "initial commit"
+
