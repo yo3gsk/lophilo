@@ -1,8 +1,10 @@
 <html>
 <head>
 <script type="text/javascript" src="/smoothie.js"></script>
-<script type="text/javascript" src="http://localhost:8001/socket.io/socket.io.js"></script>
-<script type="text/javascript" src="http://jsxt.googlecode.com/svn/trunk/js/String.js"></script>
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="/String.js"></script>
+<script type="text/javascript" src="http://d-project.googlecode.com/svn/trunk/misc/qrcode/js/qrcode.js"></script>
+<script type="text/javascript" src="http://d-project.googlecode.com/svn/trunk/misc/qrcode/js/sample.js"></script>
 <script>
 	function process_data(data) {
 		//console.log(data['timestamp']);
@@ -27,7 +29,7 @@
 		//socket.emit('lophilo', { my: 'data' });
 	}
 	var time_series = new TimeSeries();
-	var socket = io.connect('http://localhost:8001');
+	var socket = io.connect();
         var last_update_sec = 0;
         var last_update_usec = 0;
         var lophilo_configuration;
@@ -35,12 +37,11 @@
 	var datapoints = 0;
 	var skipped = 0;
 	var last_value = 0;
-	socket.on('connection', function(data) {
-		alert('connected!');
-	});
 	socket.on('lophilo_configuration', function (data) {
 		lophilo_configuration = data;
 		pps = 0;
+		datapoints = 0;
+		skipped = 0;
 		start_time = new Date().getTime();
 	});
 	socket.on('lophilo_update', function (data) {
@@ -55,10 +56,21 @@
 </script>
 </head>
 <body onload="createTimeline()" style="background-color:#333333">
-	<canvas id="chart" width="800" height="250"></canvas>
+<canvas id="chart" width="800" height="250"></canvas>
+<table>
+<tr>
+<td>
 	<br><center><b id='timestamp'>loading</b></center>
+	<br><center>one pixel = 10ms, one line = 1s </center>
+<td>
 	<br><center>data points per second: <b id='pps'>loading</b></center>
 	<br><center>skipped <b id='skipped'>loading</b>%</center>
-	<br><center>one pixel = 10ms, one line = 1s </center>
+<td>
+<div class="section">
+<script type="text/javascript">
+draw_qrcode(document.URL);
+</script>
+</div>
+
 </body>
 </html>

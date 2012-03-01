@@ -1,14 +1,12 @@
 {
   "name": "lophilo",
-  "description": "Node/Lophilo library",
-  "version": "0.0.1",
+  "description": "Node+Lophilo library",
+  "keywords" : ["arm", "hardware"],
   "homepage": "http://lophilo.com",
-  "repository": "/home/rngadam/lophilo.git",
   "author": "Ricky Ng-Adam <rngadam@lophilo.com> (http://www.linkedin.com/in/rngadam)",
-  "directories": {
-    "lib": "lib"
-  },
-  "engines": {
-    "node": "*"
-  }
+  "contributors" : [],
+  "dependencies" : {},
+  "repository" : {"type": "git", "url": "/home/rngadam/lophilo.git"},
+  "main" : "lophilo.js",
+  "version" : "0.0.1"
 }

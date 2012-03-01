@@ -1,3 +1,4 @@
+// hrtimers: http://www.ibm.com/developerworks/linux/library/l-timers-list/index.htm
 #include "lophilo.h"
 
 #include <linux/kernel.h>
@@ -5,7 +6,7 @@
 #include <linux/init.h>
 #include <linux/fs.h>
 #include <linux/mm.h>
-#include <linux/timer.h>
+#include <linux/hrtimer.h> // hrtimer_init, hrtimer_start
 #include <linux/jiffies.h> // jiffies_to_usecs
 #include <asm/uaccess.h>
 #include <linux/slab.h>
@@ -15,6 +16,9 @@
 #include <linux/poll.h> // poll_table
 
 #define MAP_MAJOR 126
+#define MS_TO_NS(x)	(x * 1E6L)
+
+unsigned long DELAY_IN_NS = MS_TO_NS(10L);
  
 static int map_lophilo(struct file *filp, struct vm_area_struct *vma);
 
@@ -32,7 +36,7 @@ struct file_operations map_fops =
   .poll    = poll_lophilo,
 };
 
-static struct timer_list my_timer;
+static struct hrtimer hr_timer;
 static struct lophilo_data* loldata;
 
 static DEFINE_KFIFO(updates, lophilo_update_t, LOPHILO_FIFO_SIZE);
@@ -40,12 +44,9 @@ wait_queue_head_t fifo_wq;
 
 static int dir = 1;
 
-void my_timer_callback( unsigned long data )
+enum hrtimer_restart my_timer_callback(struct hrtimer *timer)
 {
 	struct timeval tv;
-	if(mod_timer(&my_timer, jiffies + msecs_to_jiffies(10))) {
-		printk(KERN_INFO "Unable to reset timer");
-	}
 	if(loldata) {
 		loldata->updates[LOPHILO_PIN_XA0].value += dir;
 		if(loldata->updates[LOPHILO_PIN_XA0].value > 359) {
@@ -64,6 +65,8 @@ void my_timer_callback( unsigned long data )
 		kfifo_put(&updates, &(loldata->updates[LOPHILO_PIN_XA0]));
 		wake_up_interruptible(&fifo_wq);
 	}
+	hrtimer_forward(timer, hrtimer_get_expires(timer), ns_to_ktime(DELAY_IN_NS));
+	return HRTIMER_RESTART;
 } 
 
 static int
@@ -117,8 +120,9 @@ static int read_lophilo(struct file *filp, char __user *buf, size_t count, loff_
 static int __init 
 lophilo_init(void)
 {
-	int ret;
+	ktime_t ktime;
 
+	// set datastore
 	loldata = (struct lophilo_data*) kmalloc(PAGE_SIZE, GFP_KERNEL);
 	if(!loldata) {
 		printk("unable to allocate with kmalloc");
@@ -131,18 +135,23 @@ lophilo_init(void)
 	loldata->updates[LOPHILO_PIN_XA0].source = LOPHILO_PIN_XA0; 
 	loldata->updates[LOPHILO_PIN_XA0].value = 0;
 
-	setup_timer( &my_timer, my_timer_callback, 0 );
-	printk( "Starting timer to fire in 200ms (%ld)\n", jiffies );
-	ret = mod_timer( &my_timer, jiffies + msecs_to_jiffies(200) );
-
+	// init fifo queue
 	init_waitqueue_head(&(fifo_wq));
 	INIT_KFIFO(updates);
 
+	// register device
 	if (register_chrdev(MAP_MAJOR,"map", &map_fops) <0 ) 
 	{
 		printk("unable to get major for map module\n");
 		return -EBUSY;
 	}
+
+	// set timer
+	ktime = ktime_set( 0, DELAY_IN_NS);
+	hrtimer_init( &hr_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL );
+	hr_timer.function = &my_timer_callback;
+	printk( "Starting timer to fire in %ld ms (%ld)\n", DELAY_IN_NS, jiffies );
+	hrtimer_start( &hr_timer, ktime, HRTIMER_MODE_REL );
 
 	return 0;
 }
@@ -151,11 +160,13 @@ void __exit
 lophilo_cleanup(void)
 {
 	int ret;
-	unregister_chrdev(MAP_MAJOR, "map");
 
 	printk("Timer module uninstalling\n");
-	ret = del_timer( &my_timer );
-	if (ret) printk("The timer is still in use...\n");
+	ret = hrtimer_cancel( &hr_timer );
+	if (ret) printk("The timer was still in use...\n");
+
+	unregister_chrdev(MAP_MAJOR, "map");
+
 	kfree(loldata);
 
 	return;
