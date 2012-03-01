@@ -1,1 +1,3 @@
-dvtm "itop -a" htop "sudo iftop" "sudo tail -f /var/log/*.log"
+setterm -powersave off -blank 0
+filenames=`find /var/log -name *.log`
+dvtm "itop -a" htop "sudo iftop" "sudo tail -f $filenames"

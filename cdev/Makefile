@@ -4,8 +4,10 @@ MODULE_SUBDIR=$(TARGETDIR)/lib/modules/$(shell uname -r)
 
 all: lophilo_user lophilo.ko /dev/lophilo
 
-lophilo.ko: lophilo.c
+lophilo.ko: lophilo.c load
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+
+load:
 	-sudo rmmod lophilo
 	sudo insmod lophilo.ko
 
