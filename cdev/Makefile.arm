@@ -1,0 +1,3 @@
+obj-m += lophilo.o
+lophilo_arm.ko: lophilo.c
+	make CROSS_COMPILE=arm-linux-gnueabi- -C ${HOME}/lophilo/versatilepb M=$(PWD) modules
