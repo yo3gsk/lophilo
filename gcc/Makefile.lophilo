@@ -1,8 +1,15 @@
-.PHONY: config
+.PHONY: config deps build
+
+deps:
+	sudo apt-get build-dep gcc-4.6
 config:
 	./configure \
     		--disable-bootstrap \
 		--enable-languages=c,c++ \
-		--with-arch=armv5te --with-tune=arm926ej-s \
+		--target="arm-linux-gnueabi" \
+		--with-arch=armv5t --with-tune=arm926ej-s \
 		--with-float=softfp \
 		--prefix=${HOME}/lophilo/gcc
+
+build:
+	make -j`getconf _NPROCESSORS_ONLN`
