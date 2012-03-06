@@ -1,0 +1,21 @@
+export TMPDIR := /tmp
+export PATH := ${HOME}/lophilo/masquerade:${PATH}
+
+.PHONY: qemu-arm clean install compiler clear-cache
+
+compiler:
+	@echo ${PATH}
+	which cc
+	
+qemu-arm:
+	./configure --target-list=arm-softmmu --enable-trace-backend=simple --prefix=${HOME}/lophilo-bin
+	time make -j4
+
+install:
+	make install
+
+clean:
+	make clean
+
+clear-cache:
+	ccache-clear
