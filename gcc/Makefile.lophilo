@@ -1,0 +1,8 @@
+.PHONY: config
+config:
+	./configure \
+    		--disable-bootstrap \
+		--enable-languages=c,c++ \
+		--with-arch=armv5te --with-tune=arm926ej-s \
+		--with-float=softfp \
+		--prefix=${HOME}/lophilo/gcc
