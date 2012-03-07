@@ -10,3 +10,6 @@ linux:
 
 qemu:
 	cp -rsu ${UPSTREAM}/qemu ${LOPHILO}
+
+gcc:
+	cp -rsu ${UPSTREAM}/gcc ${LOPHILO}

@@ -1,24 +1,22 @@
-export KBUILD_OUTPUT=${HOME}/lophilo/busybox
-export KBUILD_SRC=${HOME}/upstream/busybox
 export ARCH=arm
 export CROSS_COMPILE=arm-linux-gnueabi-
 export TODAY:=$(shell date +%Y%m%d)
 export VERSION:=$(shell make -s -C ${KBUILD_SRC} kernelversion)
 export IMAGE:=bin/busybox
 
-.PHONY: ccache-stats clean config menuconfig test backup
+.PHONY: clean config menuconfig test backup
 
 menuconfig:
-	time make -C ${KBUILD_SRC} menuconfig
+	make menuconfig
 
 busybox: ${IMAGE}
 
 ${IMAGE}: Makefile
-	time make -f ${KBUILD_SRC}/Makefile defconfig
-	time make -f ${KBUILD_OUTPUT}/Makefile
+	time make defconfig
+	time make
 
 version:
-	make -C ${KBUILD_SRC} kernelversion
+	make kernelversion
 
 clean:
-	make -C ${KBUILD_SRC} clean
+	make clean

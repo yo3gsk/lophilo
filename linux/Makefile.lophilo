@@ -2,7 +2,7 @@ export ARCH=arm
 export CROSS_COMPILE=arm-linux-gnueabi-
 export IMAGE=arch/arm/boot/zImage
 
-export TODAY:=$(shell date +%Y%m%d)
+export TODAY:=$(shell date +%Y%m%d-%s)
 export VERSION:=$(shell make kernelversion)
 
 .PHONY: clean config menuconfig version kernel
@@ -15,9 +15,10 @@ menuconfig:
 
 backup:
 	mkdir -p ${HOME}/lophilo-bin/linux/versatilepb/
-	cp ${IMAGE} ${HOME}/lophilo-bin/linux/versatilepb/zImage.${ARCH}.${VERSION}.${TODAY}
+	#"cp ${IMAGE} ${HOME}/lophilo-bin/linux/versatilepb/zImage.${ARCH}.${VERSION}.${TODAY}
+	cp ${IMAGE} ${HOME}/lophilo-bin/linux/versatilepb/vmlinux.${ARCH}.${VERSION}.${TODAY}
 
 kernel: ${IMAGE}
 
 ${IMAGE}: .config
-	time make zImage
+	time make zImage V=1

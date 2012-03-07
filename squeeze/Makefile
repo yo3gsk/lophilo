@@ -1,3 +1,4 @@
+# http://www.emdebian.org/release/squeeze.html
 TARGET=/exports/squeeze
 HOSTNAME=squeeze1
 .PHONY: stage1
@@ -28,7 +29,10 @@ setupsources:
 	@echo "apt-get update"
 
 packages:
-	@echo "apt-get install etckeeper git"
+	@echo "apt-get install build-essential git ntpdate openssh-server"
+
+setuptime:
+	@echo "edit /etc/rc.local and add `ntpdate 2.asia.pool.ntp.org`
 
 nfs:
 	sudo service nfs-kernel-server restart
