@@ -29,7 +29,7 @@ setupsources:
 	@echo "apt-get update"
 
 packages:
-	@echo "apt-get install build-essential git ntpdate openssh-server"
+	@echo "apt-get install build-essential git ntpdate openssh-server nfs-client screen sudo"
 
 setuptime:
 	@echo "edit /etc/rc.local and add `ntpdate 2.asia.pool.ntp.org`
