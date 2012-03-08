@@ -1,8 +1,0 @@
-apt-get install distcc distcc-pump
-
-edit 
-
-/etc/default/distcc
-/etc/distcc/hosts
-
-sudo service distcc start

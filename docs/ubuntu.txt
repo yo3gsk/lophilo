@@ -1,0 +1,28 @@
+= initial install =
+
+add hostname to local DNS
+
+sudo apt-get install screen dvtm vim nfs-server nfs-client git openssh-server etckeeper smartmontools
+sudo apt-get dist-upgrade
+
+git config --global user.name "Ricky Ng-Adam"
+git config --global user.email rngadam@lophilo.com
+
+(as the main user) ssh-keygen, create authorized_keys
+
+etckeeper/etckeeper.conf, change to VCS=git
+
+sudo etckeeper init
+
+= reporting bugs =
+
+apport-cli -f -p glusterfs-server
+
+= etckeeper configs =
+
+common things in /etc for all hosts is to be stored in git@cnshaqs11:etc
+
+the etckeeper local repo is independent and you just cherry-pick from git@cnshaqs11:etc
+
+ cpufreq-utils cpufreq-info
+

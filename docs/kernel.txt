@@ -1,0 +1,19 @@
+KBUILD_OUTPUT=/home/rngadam/lophilo/i686
+cp ... .config
+make oldconfig
+make -j4
+
+= distcc, ccache: initial test 3.3.0 compile with settings from ubuntu 11.10 =
+
+4696.51user 667.91system 52:27.14elapsed 170%CPU (0avgtext+0avgdata 1667952maxresident)k
+3682144inputs+32555192outputs (25441major+124888806minor)pagefaults 0swaps
+
+= subsequent rebuild =
+
+184.69user 32.48system 5:52.14elapsed 61%CPU (0avgtext+0avgdata 1667984maxresident)k
+3346808inputs+1733384outputs (24786major+4075546minor)pagefaults 0swaps
+
+
+
+mkdir linux-aufs
+sudo mount -t aufs -o br=/home/rngadam/lophilo/linux:/home/rngadam/upstream/linux none /home/rngadam/lophilo/linux-aufs

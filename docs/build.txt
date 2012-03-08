@@ -1,0 +1,14 @@
+apt-get install distcc distcc-pump
+
+edit 
+
+/etc/default/distcc
+/etc/distcc/hosts
+
+sudo service distcc start
+
+CCACHE_PREFIX="distcc"
+
+sudo apt-get install ccache
+
+http://shri.blog.kraya.co.uk/2011/11/24/glusterfs-howto/

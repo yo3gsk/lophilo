@@ -15,3 +15,31 @@ git config --global user.email rngadam@lophilo.com
 
 git push cnshaqs10
 git pull cnshaqs10
+
+= gitolite =
+
+http://www.bigfastblog.com/install-gitolite-to-manage-your-git-repositories
+
+sudo adduser \
+  --system \
+  --shell /bin/bash \
+  --gecos 'git version control' \
+  --group \
+  --disabled-password \
+  --home /home/git git
+
+cp .ssh/id_rsa.pub /tmp
+
+get the public key in the authorized_keys of the git user
+
+su - git
+
+git clone git://github.com/sitaramc/gitolite
+gitolite/src/gl-system-install
+gl-setup -q /tmp/YourName.pub
+
+git clone git@cnshaqs11:gitolite-admin (git clone git@localhost:gitolite-admin)
+
+...add keydir and conf
+
+git config remote.origin.url git@cnshaqs11:etc

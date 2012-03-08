@@ -1,0 +1,273 @@
+= Networking =
+
+== documentation ==
+
+http://wiki.qemu.org/Documentation/Networking/NAT
+
+== installation ==
+
+sudo apt-get install bridge-utils
+
+== emulated on the versatilepb QEMU host ==
+
+eth0: SMC91C11xFD (rev 1) at c883a000 IRQ 25 [nowait]
+eth0: Ethernet addr: 52:54:00:12:34:56
+
+name "smc91c111", bus System
+
+== config ==
+
+any interface added to bridge needs to be promisc:
+
+sudo /sbin/ifconfig eth0 0.0.0.0 promisc up
+sudo /sbin/brctl addif br0
+
+creating a bridge:
+
+brctl addbr br0
+
+adding an interface to it:
+
+brctl addif br0 eth0
+
+
+to select which default device in the bridge to use:
+
+ip link set br0 address f4:6d:04:08:f1:5f
+(replace with hardware address of eth0)
+
+
+= device creation =
+
+mkdir dev
+cd dev
+mknod ttyAMA0 c 204 64
+
+= usermode networking =
+
+these are the defaults provided by qemu:
+
+IP-Config: Got DHCP answer from 10.0.2.2, my address is 10.0.2.15             
+IP-Config: Complete:                                                          
+     device=eth0, addr=10.0.2.15, mask=255.255.255.0, gw=10.0.2.2, 
+     host=10.0.2.15, domain=, nis-domain=(none),                   
+     bootserver=10.0.2.2, rootserver=10.0.0.13, rootpath=   
+
+(qemu) info network
+VLAN 0 devices:
+  user.0: type=user,net=10.0.2.0,restrict=off
+  smc91c111.0: type=nic,model=smc91c111,macaddr=52:54:00:12:34:56
+Devices not on any VLAN:
+
+= problems =
+
+1) can't see console when booted
+- missing /dev/ttyAMA0 device in image?
+- created with mknod above, but needs to re-created initrd
+
+2) can't mount NFS root using usermode networking
+- ip kernel autoconfig works with the DHCP (needed to enable to the DHCP option in kernel)
+- lack of icmp makes it difficult to see if the host is accessible
+- how does routing work between host and qemu?
+
+3) can't get tap network device (bridged) to work
+- because eth0 in virtualbox is already bridged?
+
+4) vga console when -nographic?
+
+clcd-pl11x dev:20: PL110 rev0 at 0x10120000
+clcd-pl11x dev:20: Versatile hardware, VGA display
+Console: switching to colour frame buffer device 80x60
+
+
+= checklist =
+
+make sure that:
+
+...nfsroot is mounted rw
+.../dev is populated
+...(for qemu user network) exports are to 127.0.0.1 with "insecure"
+.../etc/inittab is correct with all runlevels on serial port
+
+	::respawn:/sbin/getty -L ttyAMA0 115200 vt100
+
+...that binaries are compiled for the correct cpu target
+
+	-mcpu=arm926ej-s -msoft-float
+
+...that an executable (chmod +x) /etc/init.d/rcS exist and has essential directory creation and mounts
+...everything is compiled with the new ARM EABI (CONFIG_AEABI=y, -mabi=aapcs-linux) not  -mabi=apcs-gnu
+= building the kernel =
+
+cp -rs ~/upstream/linux ~/lophilo
+cd ~/lophilo/linux
+cp ~/lophilo/versatilepb/.config .config
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- -j4
+
+= highlight an instruction =
+
+> FWIW when I have this kind of weird problem I get into gdb with the 
+> binary and use 
+> display/i $pc 
+> then stepi to walk the assembly. When it is a strange problem like 
+
+
+= compile instructions =
+
+_ASM_GOTO    -D"KBUILD_STR(s)=#s" -D"KBUILD_BASENAME=KBUILD_STR(open)"  -D"KBUILD_MODNAME=KBUILD_STR(open)" -c -o fs/open.o fs/open.c
+
+  arm-linux-gnueabi-gcc -Wp,-MD,kernel/.itimer.o.d  -nostdinc -isystem /usr/lib/gcc/arm-linux-gnueabi/4.6.1/include -I/home/rngadam/lo
+philo/linux/arch/arm/include -Iarch/arm/include/generated -Iinclude  -include /home/rngadam/lophilo/linux/include/linux/kconfig.h -D__
+KERNEL__ -mlittle-endian -Iarch/arm/mach-versatile/include -Iarch/arm/plat-versatile/include -Wall -Wundef -Wstrict-prototypes -Wno-tr
+igraphs -fno-strict-aliasing -fno-common -Werror-implicit-function-declaration -Wno-format-security -fno-delete-null-pointer-checks -O
+2 -marm -fno-dwarf2-cfi-asm -fno-omit-frame-pointer -mapcs -mno-sched-prolog -mabi=apcs-gnu -mno-thumb-interwork -D__LINUX_ARM_ARCH__=
+5 -march=armv5te -mtune=arm9tdmi -msoft-float -Uarm -Wframe-larger-than=1024 -fno-stack-protector -Wno-unused-but-set-variable -fno-om
+it-frame-pointer -fno-optimize-sibling-calls -Wdeclaration-after-statement -Wno-pointer-sign -fno-strict-overflow -fconserve-stack -DC
+C_HAVE_ASM_GOTO    -D"KBUILD_STR(s)=#s" -D"KBUILD_BASENAME=KBUILD_STR(itimer)"  -D"KBUILD_MODNAME=KBUILD_STR(itimer)" -c -o kernel/iti
+mer.o kernel/itimer.c
+
+-mlittle-endian -Wall -mabi=apcs-gnu -mno-thumb-interwork -march=armv5te -msoft-float -Uarm
+
+-mtune=arm9tdmi
+
+= qemu console help =
+
+acl_add aclname match allow|deny [index] -- add a match rule to the access control list
+acl_policy aclname allow|deny -- set default access control list policy
+acl_remove aclname match -- remove a match rule from the access control list
+acl_reset aclname -- reset the access control list
+acl_show aclname -- list rules in the access control list
+balloon target -- request VM to change its memory allocation (in MB)
+block_passwd block_passwd device password -- set the password of encrypted block devices
+block_resize device size -- resize a block image
+boot_set bootdevice -- define new values for the boot device list
+change device filename [format] -- change a removable medium, optional format
+client_migrate_info protocol hostname port tls-port cert-subject -- send migration info to spice/vnc client
+closefd closefd name -- close a file descriptor previously passed via SCM rights
+commit device|all -- commit changes to the disk images (if -snapshot is used) or backing files
+cpu index -- set the default CPU
+c|cont  -- resume emulation
+delvm tag|id -- delete a VM snapshot from its tag or id
+device_add driver[,prop=value][,...] -- add device, like -device on the command line
+device_del device -- remove device
+drive_del device -- remove host block device
+eject [-f] device -- eject a removable medium (use -f to force it)
+expire_password protocol time -- set spice/vnc password expire-time
+gdbserver [device] -- start gdbserver on given device (default 'tcp::1234'), stop with 'none'
+getfd getfd name -- receive a file descriptor via SCM rights and assign it a name
+help|? [cmd] -- show the help
+host_net_add tap|user|socket|vde|dump [options] -- add host VLAN client
+host_net_remove vlan_id name -- remove host VLAN client
+hostfwd_add [vlan_id name] [tcp|udp]:[hostaddr]:hostport-[guestaddr]:guestport -- redirect TCP or UDP connections from host to guest (
+requires -net user)
+hostfwd_remove [vlan_id name] [tcp|udp]:[hostaddr]:hostport -- remove host-to-guest TCP or UDP redirection
+i /fmt addr -- I/O port read
+info [subcommand] -- show various information about the system state
+loadvm tag|id -- restore a VM snapshot from its tag or id
+log item1[,...] -- activate logging of the specified items to '/tmp/qemu.log'
+logfile filename -- output logs to 'filename'
+memsave addr size file -- save to disk virtual memory dump starting at 'addr' of size 'size'
+migrate [-d] [-b] [-i] uri -- migrate to URI (using -d to not wait for completion)
+                         -b for migration without shared storage with full copy of disk
+                         -i for migration without shared storage with incremental copy of disk (base image shared between src and dest
+ination)
+migrate_cancel  -- cancel the current VM migration
+migrate_set_downtime value -- set maximum tolerated downtime (in seconds) for migrations
+migrate_set_speed value -- set maximum speed (in bytes) for migrations. Defaults to MB if no size suffix is specified, ie. B/K/M/G/T
+mouse_button state -- change mouse button state (1=L, 2=M, 4=R)
+mouse_move dx dy [dz] -- send mouse move events
+mouse_set index -- set which mouse device receives events
+netdev_add [user|tap|socket],id=str[,prop=value][,...] -- add host network device
+
+netdev_del id -- remove host network device
+o /fmt addr value -- I/O port write
+pcie_aer_inject_error [-a] [-c] id <error_status> [<tlp header> [<tlp header prefix>]] -- inject pcie aer error
+                         -a for advisory non fatal error
+                         -c for correctable error
+                        <id> = qdev device id
+                        <error_status> = error string or 32bit
+                        <tlb header> = 32bit x 4
+                        <tlb header prefix> = 32bit x 4
+pmemsave addr size file -- save to disk physical memory dump starting at 'addr' of size 'size'
+p|print /fmt expr -- print expression value (use $reg for CPU register access)
+q|quit  -- quit the emulator
+savevm [tag|id] -- save a VM snapshot. If no tag or id are provided, a new snapshot is created
+screendump filename -- save screen into PPM image 'filename'
+sendkey keys [hold_ms] -- send keys to the VM (e.g. 'sendkey ctrl-alt-f1', default hold time=100 ms)
+set_link name on|off -- change the link status of a network adapter
+set_password protocol password action-if-connected -- set spice/vnc password
+singlestep [on|off] -- run emulation in singlestep mode or switch to normal mode
+snapshot_blkdev device [new-image-file] [format] -- initiates a live snapshot
+                        of device. If a new image file is specified, the
+                        new image file will become the new root image.
+                        If format is specified, the snapshot file will
+                        be created in that format. Otherwise the
+                        snapshot will be internal! (currently unsupported)
+stop  -- stop emulation
+stopcapture capture index -- stop capture
+sum addr size -- compute the checksum of a memory region
+system_powerdown  -- send system power down event
+system_reset  -- reset the system
+trace-event name on|off -- changes status of a specific trace event
+trace-file on|off|flush|set [arg] -- open, close, or flush trace file, or set a new file name
+usb_add device -- add USB device (e.g. 'host:bus.addr' or 'host:vendor_id:product_id')
+usb_del device -- remove USB device 'bus.addr'
+watchdog_action [reset|shutdown|poweroff|pause|debug|none] -- change watchdog action
+wavcapture path [frequency [bits [channels]]] -- capture audio to a wave file (default frequency=44100 bits=16 channels=2)
+x /fmt addr -- virtual memory dump starting at 'addr'
+xp /fmt addr -- physical memory dump starting at 'addr'
+
+= TODO =
+
+* new QEMU lophilo machine (copy of versatile platform)
+** add MMIO connected to user program in the host space
+* GDB for ARM
+** test with QEMU gdbserver
+* busybox
+** build with insmod support
+** load lophilo.ko
+** load cross-compiled node.js
+** add oscilloscope demo
+* run Debian squeeze with qemu-system-arm and Linux kernel 3.3
+** install gdb and build-essential (will be the build server)
+
+= mismatch in files =
+
+even though the object files are correct:
+
+$ readelf -A archival/unzip.o
+Attribute Section: aeabi
+File Attributes
+  Tag_CPU_name: "ARM926EJ-S"
+  Tag_CPU_arch: v5TEJ
+
+the linker produces the wrong version:
+
+$ readelf -A busybox
+Attribute Section: aeabi
+File Attributes
+  Tag_CPU_name: "7-A"
+  Tag_CPU_arch: v7
+
+armelf_linux_eabi armelfb_linux_eabi
+
+you can see this in : --with-arch=armv7-a
+
+# arm-linux-gnueabi-gcc-4.6 -v
+Using built-in specs.
+COLLECT_GCC=arm-linux-gnueabi-gcc-4.6
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/arm-linux-gnueabi/4.6.1/lto-wrapper
+Target: arm-linux-gnueabi
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu/Linaro 4.6.1-9ubuntu3' --with-bugurl=file:///usr/share/doc/gcc-4.6/READ
+ME.Bugs --enable-languages=c,c++,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-4.6 --enable-shared --enable-linker-build-id --w
+ith-system-zlib --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --with-gxx-include-dir=/usr/arm-linux-gnueabi/
+include/c++/4.6.1 --libdir=/usr/lib --enable-nls --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --enable-pl
+ugin --enable-objc-gc --enable-multilib --disable-sjlj-exceptions --with-arch=armv7-a --with-float=softfp --with-fpu=vfpv3-d16 --with-
+mode=thumb --disable-werror --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=arm-linux-gnueabi --progra
+m-prefix=arm-linux-gnueabi- --includedir=/usr/arm-linux-gnueabi/include --with-headers=/usr/arm-linux-gnueabi/include --with-libs=/usr
+/arm-linux-gnueabi/lib
+Thread model: posix
+gcc version 4.6.1 (Ubuntu/Linaro 4.6.1-9ubuntu3)
+
+
+eth0: spurious interrupt (mask = 0xb3)

@@ -3,3 +3,43 @@
 - build toolchain
 - build glibc
 - use tmpfs instead of going everything to NFS
+
+= plan for build system and qemu =
+
+== now ==
+
+/home/rngadam/upstream exported NFS readonly upstream (bare git repo mirrors and checkouts)
+
+on ARM build machine: 
+
+* upstream mounted as ${HOME}/upstream
+* checkout of lophilo in ${HOME}/lophilo (emulated "local disk" qcow or still on NFS root disk?)
+** local disk means creating a QCOW image attached to the qemu
+
+TODO:
+
+* create unique MAC address associated with hostname (squeeze1)
+* attach qcow image and mount it as /home
+* install openssh-server
+* create user rngadam and add keys
+** ...and lophilo (will run the production node.js on port 80)
+* fix: eth0: spurious interrupt (mask = 0xb3)
+
+Final image will be:
+
+* lophilo kernel driver
+* qemu-system-arm 
+* customized zImage for Linux 3.3/3.4 (for armv5tej)
+* busybox (for armv5tej)
+* node.js (for armv5tej)
+
+== future ==
+
+git repositories mirrors in /home/git/repositories (managed by gitolite)
+
+Checkouts in ${HOME}/upstream
+
+for software not supporting out-of-tree builds (such as gcc), 
+symlinked into subdirectories of ${HOME}/lophilo
+
+source is also checkout in 
