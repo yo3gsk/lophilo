@@ -1,0 +1,8 @@
+#Main install
+
+deb http://www.emdebian.org/grip/ squeeze main
+deb-src http://www.emdebian.org/grip/ squeeze main
+
+#All components
+deb http://www.emdebian.org/grip/ squeeze dev debug java doc
+deb-src http://www.emdebian.org/grip/ squeeze dev debug java doc
