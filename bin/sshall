@@ -1,0 +1,1 @@
+dvtm 'ssh cnshaqs10 $@' 'ssh cnshaqs11 $@' 'ssh squeeze1 $@' 
