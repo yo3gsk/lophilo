@@ -1,15 +1,20 @@
+SOURCE:=${HOME}/upstream/gcc
 .PHONY: config deps build
 
 deps:
 	sudo apt-get build-dep gcc-4.6
 config:
-	./configure \
+	${SOURCE}/configure \
     		--disable-bootstrap \
 		--enable-languages=c,c++ \
-		--target="arm-linux-gnueabi" \
-		--with-arch=armv5t --with-tune=arm926ej-s \
+		--with-cpu=armv5te --with-tune=arm926ej-s \
 		--with-float=softfp \
-		--prefix=${HOME}/lophilo/gcc
+		--prefix=${HOME}/lophilo/gcc \
+		--target=arm-linux-gnueabi \
+		--program-prefix=arm-linux-gnueabi-
 
 build:
-	make -j`getconf _NPROCESSORS_ONLN`
+	time make -j`getconf _NPROCESSORS_ONLN`
+
+cleanconfigs:
+	find . -name "config.cache" -exec rm {} \;

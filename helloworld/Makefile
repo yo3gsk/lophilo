@@ -8,4 +8,4 @@ objdump:
 	arm-linux-gnueabi-objdump -x helloworld
 
 elf:
-	readelf -h helloworld | grep Flags
+	readelf -A helloworld

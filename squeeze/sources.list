@@ -1,14 +1,8 @@
-#############################################################
-################### OFFICIAL DEBIAN REPOS ###################
-#############################################################
+#Main install
 
-###### Debian Main Repos
-deb http://ftp.cn.debian.org/debian squeeze main
-deb-src http://ftp.cn.debian.org/debian squeeze main
+deb http://www.emdebian.org/grip/ squeeze main
+deb-src http://www.emdebian.org/grip/ squeeze main
 
-deb http://ftp.cn.debian.org/debian squeeze-updates main
-deb-src http://ftp.cn.debian.org/debian squeeze-updates main
-
-###### Debian Update Repos
-deb http://security.debian.org/ squeeze/updates main contrib non-free 
-deb-src http://security.debian.org/ squeeze/updates main contrib non-free 
+#All components
+deb http://www.emdebian.org/grip/ squeeze dev debug java doc
+deb-src http://www.emdebian.org/grip/ squeeze dev debug java doc
