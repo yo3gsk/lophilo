@@ -1,13 +1,16 @@
+export ARCH:=$(shell /usr/bin/dpkg-architecture -qDEB_HOST_ARCH_CPU)
 obj-m += lophilo.o
 TARGETDIR=$(HOME)/lophilo-bin
 MODULE_SUBDIR=$(TARGETDIR)/lib/modules/$(shell uname -r)
 
-all: lophilo_user lophilo.ko /dev/lophilo
+.PHONY: load clean install
 
-lophilo.ko: lophilo.c load
+all: lophilo_user lophilo.ko /dev/lophilo load
+
+lophilo.ko: lophilo.c
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
 
-load:
+load: lophilo.ko
 	-sudo rmmod lophilo
 	sudo insmod lophilo.ko
 
