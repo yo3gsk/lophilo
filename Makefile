@@ -6,7 +6,11 @@ LOPHILO=${HOME}/lophilo
 all: linux qemu
 
 linux:
-	cp -rsu ${UPSTREAM}/linux ${LOPHILO}
+	# make-kpkg packages symlinks... and has no option
+	# to build out of tree
+	#cp -rsu ${UPSTREAM}/linux ${LOPHILO}
+	mkdir -p ${LOPHILO}/linux-aufs
+	sudo mount -t aufs -o br=${LOPHILO}/linux:${UPSTREAM}/linux none ${LOPHILO}/linux-aufs
 
 qemu:
 	cp -rsu ${UPSTREAM}/qemu ${LOPHILO}

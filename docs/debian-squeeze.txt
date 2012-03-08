@@ -40,3 +40,30 @@ dhcp
 bootm
 
 setenv bootargs ip=dhcp noinitrd init=/sbin/init root=/dev/nfs rw nfsroot=10.236.10.94:/exports/mini2440/armel-squeeze nfsrootdebug rootwait
+
+= install kernel  =
+
+root@squeeze1:/lib/modules/3.3.0-rc1+# rm build source
+root@squeeze1:/lib/modules/3.3.0-rc1+# ln -s /usr/include/linux/ build
+root@squeeze1:/lib/modules/3.3.0-rc1+# ln -s /usr/include/linux/ source
+
+= architecture information =
+
+root@squeeze1:~/lophilo/cdev# dpkg-architecture
+DEB_BUILD_ARCH=armel
+DEB_BUILD_ARCH_OS=linux
+DEB_BUILD_ARCH_CPU=arm
+DEB_BUILD_ARCH_BITS=32
+DEB_BUILD_ARCH_ENDIAN=little
+DEB_BUILD_GNU_CPU=arm
+DEB_BUILD_GNU_SYSTEM=linux-gnueabi
+DEB_BUILD_GNU_TYPE=arm-linux-gnueabi
+DEB_HOST_ARCH=armel
+DEB_HOST_ARCH_OS=linux
+DEB_HOST_ARCH_CPU=arm
+DEB_HOST_ARCH_BITS=32
+DEB_HOST_ARCH_ENDIAN=little
+DEB_HOST_GNU_CPU=arm
+DEB_HOST_GNU_SYSTEM=linux-gnueabi
+DEB_HOST_GNU_TYPE=arm-linux-gnueabi
+

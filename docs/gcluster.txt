@@ -1,0 +1,124 @@
+
+on both hosts:
+
+sudo mkdir -p /gdata/ccachevol
+sudo apt-get install glusterfs-server glusterfs-client
+
+on rngadam-vbox:
+
+sudo ufw disable
+sudo gluster peer probe cnshaqs10
+
+on cnshaqs10:
+
+sudo ufw disable
+sudo gluster peer probe rngadam-vbox
+
+NOTE: copy the singular peer from /etc/glusterd/peers to the other host
+
+service glusterfs-server stop
+service glusterfs-server start
+
+sudo gluster peer status
+sudo gluster volume create ccachevol stripe 2 replica 2 transport tcp cnshaqs10:/gdata/ccachevol rngadam-vbox:/gdata/ccachevol
+sudo gluster volume start ccachevol
+sudo gluster volume info
+
+NOTE: if you get the order of mount wrong, you'll end up with locks up on any read of the mounted disk!
+
+on rngadam-vbox:
+
+sudo mkdir -p /mnt/ccache
+sudo mount -t glusterfs rngadam-vbox:ccachevol /mnt/ccache 
+
+
+on cnshaqs10:
+
+sudo mkdir -p /mnt/ccache
+sudo mount -t glusterfs cnshaqs10:ccachevol /mnt/ccache 
+
+check:
+
+root@cnshaqs10:~# mount
+[...]
+cnshaqs10:ccachevol on /mnt/ccache type fuse.glusterfs (rw,allow_other,default_permissions,max_read=131072)
+
+NOTE: Make sure DNS forward and reverse lookup work!
+
+= fstab =
+
+thinkpad:/sync1   /home             glusterfs    noatime,nodiratime 0 0
+
+= syncing =
+
+do this on the server thas has changes:
+
+find /mnt/ccache -noleaf -print0 | xargs --null stat >/dev/null
+
+= ipv6 lookup fails =
+
+==> /var/log/glusterfs/etc-glusterfs-glusterd.vol.log <==
+[2012-03-01 15:11:57.691325] E [common-utils.c:125:gf_resolve_ip6] 0-resolver: getaddrinfo failed (Name or service not known)
+[2012-03-01 15:11:57.691504] E [name.c:253:af_inet_client_get_remote_sockaddr] 0-management: DNS resolution failed on host cnshaqs10
+[2012-03-01 15:12:05.695908] E [common-utils.c:125:gf_resolve_ip6] 0-resolver: getaddrinfo failed (Name or service not known)
+[2012-03-01 15:12:05.696150] E [name.c:253:af_inet_client_get_remote_sockaddr] 0-management: DNS resolution failed on host cnshaqs10
+[2012-03-01 15:12:13.701208] E [common-utils.c:125:gf_resolve_ip6] 0-resolver: getaddrinfo failed (Name or service not known)
+[2012-03-01 15:12:13.701384] E [name.c:253:af_inet_client_get_remote_sockaddr] 0-management: DNS resolution failed on host cnshaqs10
+[2012-03-01 15:12:21.705755] E [common-utils.c:125:gf_resolve_ip6] 0-resolver: getaddrinfo failed (Name or service not known)
+[2012-03-01 15:12:21.705957] E [name.c:253:af_inet_client_get_remote_sockaddr] 0-management: DNS resolution failed on host cnshaqs10
+[2012-03-01 15:12:29.710809] E [common-utils.c:125:gf_resolve_ip6] 0-resolver: getaddrinfo failed (Name or service not known)
+[2012-03-01 15:12:29.711020] E [name.c:253:af_inet_client_get_remote_sockaddr] 0-management: DNS resolution failed on host cnshaqs10
+
+rngadam@rngadam-vbox:~$ nslookup
+> set q=any
+>  rngadam-vbox
+Server:         10.236.20.254
+Address:        10.236.20.254#53
+
+Name:   rngadam-vbox
+Address: 10.236.10.160
+
+> set q=AAAA
+> rngadam-vbox
+Server:         10.236.20.254
+Address:        10.236.20.254#53
+
+*** Can't find rngadam-vbox: No answer
+
+vi /etc/glusterfs/glusterd.vol
+
+option transport.address-family inet
+
+= bad startup =
+
+rngadam@rngadam-vbox:/etc/glusterfs$ sudo service glusterfs-server start
+ * Starting glusterd service glusterd                                                                                                                            [ OK ]
+/usr/sbin/glusterd: option requires an argument -- 'f'
+Try `glusterd --help' or `glusterd --usage' for more information.
+
+"/etc/init.d/glusterfs-server"
+
+CONFIGFILE=/etc/glusterfs/glusterd.vol
+
+= Disconnections =
+
+takes about 60 seconds to come back from a disconnect
+
+
+= ccache =
+
+CCACHE_TEMPDIR=/tmp
+CCACHE_PREFIX=distcc
+CCACHE_DIR=/gdata/ccache
+
+= using nfs =
+
+
+ sudo apt-get install nfs-common
+sudo service glusterfs-server restart
+
+ gluster volume set ccachevol nfs.disable on
+
+"operation failed" -> restart glusterfs-server...
+
+ mount -t nfs rngadam-vbox:/ccachevol /mnt/ccache

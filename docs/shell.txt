@@ -1,0 +1,9 @@
+DVTM ¨C Useful Commands:
+
+CTRL+g c (create new window)
+CTRL+g i (select window in counter-clockwise fashion)
+CTRL+g u (select window in clockwise fashion)
+CTRL+g b (Bottom Stack Tiling)
+CTRL+g t (Vertical (top) Stack Tiling)
+CTRL+g g (Grid Stack Tiling)
+CTRL+g m (Full Screen Mode; use b, t, or g to bring view back to tiled mode)

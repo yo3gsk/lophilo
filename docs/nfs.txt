@@ -1,4 +1,4 @@
-
+apt-get install nfs-server nfs-common
 = NFS mounting =
 
 heavy NFS writes cause NFS to hang:

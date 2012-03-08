@@ -1,0 +1,15 @@
+rngadam@rngadam-vbox:~$ nslookup
+> set q=any
+>  rngadam-vbox.cowin.local
+Server:         10.236.20.254
+Address:        10.236.20.254#53
+
+Name:   rngadam-vbox.cowin.local
+Address: 10.236.10.160
+
+> set q=AAAA
+> rngadam-vbox.cowin.local
+Server:         10.236.20.254
+Address:        10.236.20.254#53
+
+*** Can't find rngadam-vbox.cowin.local: No answer

@@ -49,6 +49,7 @@ http://www.digriz.org.uk/debian-nfs-root
 
 sudo apt-get install glib2.0-dev zlib1g-dev
 ./configure --target-list=arm-softmmu --enable-trace-backend=simple --prefix=$HOME/lophilo-bin
+make
 make install
 
 = running =
@@ -89,3 +90,109 @@ machine_init(integratorcp_machine_init);
 
 http://www.cnx-software.com/2011/09/26/beagleboard-emulator-in-ubuntu-with-qemu/
 http://balau82.wordpress.com/2010/02/28/hello-world-for-bare-metal-arm-using-qemu/
+
+= original compile =
+
+61.99user 59.69system 2:15.25elapsed 89%CPU (0avgtext+0avgdata 226576maxresident)k
+53304inputs+106880outputs (43major+1232654minor)pagefaults 0swaps
+
+63.63user 60.86system 2:07.64elapsed 97%CPU (0avgtext+0avgdata 226576maxresident)k
+0inputs+106880outputs (0major+1232735minor)pagefaults 0swaps
+
+= ccache/distcc (no distribution, no cnshaqs10) =
+
+22.94user 28.63system 1:06.77elapsed 77%CPU (0avgtext+0avgdata 226544maxresident)k
+61640inputs+115952outputs (71major+535191minor)pagefaults 0swaps
+
+= ccache/distcc redo =
+
+2.74user 10.88system 0:16.97elapsed 80%CPU (0avgtext+0avgdata 226576maxresident)k
+72inputs+54504outputs (0major+221336minor)pagefaults 0swaps
+
+after ccache -C and clean:
+
+60.83user 80.71system 2:32.14elapsed 93%CPU (0avgtext+0avgdata 226576maxresident)k
+0inputs+330328outputs (0major+1721312minor)pagefaults 0swaps
+
+make clean:
+
+2.66user 10.66system 0:15.50elapsed 85%CPU (0avgtext+0avgdata 226576maxresident)k
+0inputs+54504outputs (0major+221300minor)pagefaults 0swaps
+
+
+= gold linker =
+
+
+sudo apt-get install binutils-gold
+
+make[1]: Leaving directory `/home/rngadam/upstream/qemu'
+56.28user 75.36system 2:21.18elapsed 93%CPU (0avgtext+0avgdata 133728maxresident)k
+624inputs+330648outputs (68major+1707172minor)pagefaults 0swaps
+
+make clean
+
+2.12user 10.06system 0:14.72elapsed 82%CPU (0avgtext+0avgdata 112480maxresident)k
+0inputs+54824outputs (65major+207223minor)pagefaults 0swaps
+
+= with /tmp is tmpfs =
+
+ccache is supposed to use it too...
+
+make[1]: Leaving directory `/home/rngadam/upstream/qemu'
+56.59user 73.59system 2:21.72elapsed 91%CPU (0avgtext+0avgdata 133728maxresident)k
+112inputs+77616outputs (65major+1707207minor)pagefaults 0swaps
+
+
+layers....
+
+sudo unionfs-fuse -o cow,max_files=32768 -o allow_other,use_ino,suid,dev,nonempty /tmp=RW:/home/rngadam/upstream/qemu=RO  /home/rngadam/upstream/qemu-unionfs
+
+make[1]: Leaving directory `/home/rngadam/upstream/qemu-unionfs'
+54.36user 95.42system 3:25.97elapsed 72%CPU (0avgtext+0avgdata 129600maxresident)k
+256752inputs+59144outputs (713major+1691973minor)pagefaults 0swaps
+
+sudo mount -t aufs -o br=/tmp:/home/rngadam/upstream/qemu none /home/rngadam/upstream/qemu-aufs
+
+make[1]: Leaving directory `/home/rngadam/upstream/qemu-aufs'
+54.82user 75.37system 2:22.66elapsed 91%CPU (0avgtext+0avgdata 133728maxresident)k
+80inputs+24536outputs (0major+1707652minor)pagefaults 0swaps
+
+mount -t overlayfs overlayfs -olowerdir=/home/rngadam/upstream/qemu,upperdir=/tmp /home/rngadam/upstream/qemu-overlayfs
+
+55.82user 74.23system 2:28.70elapsed 87%CPU (0avgtext+0avgdata 133728maxresident)k
+0inputs+24536outputs (0major+1707406minor)pagefaults 0swaps
+
+= change to virtualbox =
+
+pae memory
+i/o host memory cache
+
+after fresh boot:
+
+58.36user 72.80system 2:24.93elapsed 90%CPU (0avgtext+0avgdata 133728maxresident)k
+77632inputs+77616outputs (407major+1705767minor)pagefaults 0swaps
+
+
+bumping up the -j
+
+61.77user 75.45system 2:22.17elapsed 96%CPU (0avgtext+0avgdata 133728maxresident)k
+16inputs+79616outputs (65major+1706708minor)pagefaults 0swaps
+
+ramfs
+
+sudo mount -t ramfs my_ramfs /home/rngadam/upstream/qemu-ramfs -o size=150m,maxsize=150m
+
+114.05user 121.00system 4:03.11elapsed 96%CPU (0avgtext+0avgdata 556672maxresident)k
+688inputs+48040outputs (3major+2465373minor)pagefaults 0swaps
+
+
+= clang =
+
+$ ../configure --prefix=$INSTALL --target-list=i386-bsd-user \
+  --enable-tcg-interpreter \
+  --cc=clang
+
+  LINK  arm-softmmu/qemu-system-arm
+make[1]: Leaving directory `/home/rngadam/upstream/qemu'
+47.69user 76.72system 2:12.19elapsed 94%CPU (0 avgtext+0avgdata 122832maxresident)k
+6800inputs+71400outputs (102major+2593584minor)pagefaults 0swaps
