@@ -45,11 +45,12 @@ install-debian:
 debian:
 	#make deb-pkg
 	#dpkg-buildpackage -b -aarmel
-	ln -s kernel-pkg.conf ${HOME}/.kernel-pkg.conf
-	make-kpkg --revision "3.3.0" \
+	-ln -s kernel-pkg.conf ${HOME}/.kernel-pkg.conf
+	make-kpkg \
 	  --revision `date +%Y%m%d-%s` \
 	  --arch=armel --us --uc --initrd \
 	  --rootcmd fakeroot \
+	  -j`getconf _NPROCESSORS_ONLN` \
 	  kernel-image kernel-headers kernel-doc kernel-source
 	@echo "move packages in parent directory to target"
 	@echo "install with:  `dpkg -i --ignore-depends=libtinfo5 *.deb`
