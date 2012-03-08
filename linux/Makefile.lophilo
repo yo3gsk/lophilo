@@ -1,14 +1,16 @@
-export ARCH=arm
-export CROSS_COMPILE=arm-linux-gnueabi-
-export IMAGE=arch/arm/boot/zImage
+export ARCH:=arm
+export CROSS_COMPILE:=arm-linux-gnueabi-
+export IMAGE:=arch/arm/boot/zImage
 
 export TODAY:=$(shell date +%Y%m%d-%s)
 export VERSION:=$(shell make kernelversion)
-export INSTALL_MOD_PATH=/exports/squeeze
-export INSTALL_HDR_PATH=/exports/squeeze/usr/include/linux 
-export BUILD_DIR:=/exports/squeeze/lib/modules/`make -s kernelversion`+/build
+export INSTALL_MOD_PATH:=/exports/squeeze
+export INSTALL_HDR_PATH:=/exports/squeeze/usr/include/linux 
+export KERNELVERSION:=`make -s kernelversion`
+export BUILD_DIR:=/exports/squeeze/lib/modules/${KERNELVERSION}/build
 
-.PHONY: clean config menuconfig version kernel
+.PHONY: clean config menuconfig version kernel debian install-debian
+
 
 config: .config
 	yes "" | make oldconfig > conf.new
@@ -36,3 +38,18 @@ modules_prepare:
 	sudo mkdir -p ${BUILD_DIR}
 	sudo chown rngadam:rngadam ${BUILD_DIR}
 	cp -fr --copy-contents --dereference * ${BUILD_DIR}
+
+install-debian:
+	apt-get install kernel-package
+
+debian:
+	#make deb-pkg
+	#dpkg-buildpackage -b -aarmel
+	ln -s kernel-pkg.conf ${HOME}/.kernel-pkg.conf
+	make-kpkg --revision "3.3.0" \
+	  --revision `date +%Y%m%d-%s` \
+	  --arch=armel --us --uc --initrd \
+	  --rootcmd fakeroot \
+	  kernel-image kernel-headers kernel-doc kernel-source
+	@echo "move packages in parent directory to target"
+	@echo "install with:  `dpkg -i --ignore-depends=libtinfo5 *.deb`
