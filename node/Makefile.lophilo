@@ -1,4 +1,15 @@
-.PHONY: deps node
+export PLATFORM_FLAGS=-mlittle-endian -mno-thumb-interwork -mabi=aapcs-linux -mfloat-abi=soft -march=armv5te -mtune=arm926ej-s -msoft-float -Uarm
+export CROSS_COMPILE=${HOME}/upstream/arm-2011.09/bin/arm-none-linux-gnueabi-
+export CXX:=${CROSS_COMPILE}g++
+export CFLAGS:=${PLATFORM_FLAGS}
+export CC:=${CROSS_COMPILE}gcc
+export CXXFLAGS:=${PLATFORM_FLAGS}
+ZLIB_INSTALL:=${HOME}/lophilo/node/zlib
+export LDFLAGS:=-L${ZLIB_INSTALL}/lib
+
+export NODE_INSTALLER:=${HOME}/lophilo-bin/installer/arm
+
+.PHONY: deps node install build zlib config
 
 all:
 	@echo "choose deps or node"
@@ -6,7 +17,21 @@ deps:
 	@echo "installing packages"
 	sudo apt-get install python
 
-node:
+config:
 	@echo "configuring and making node"
-	./configure --prefix=$(HOME)/lophilo-bin --openssl-use-sys=OPENSSL_USE_SYS
-	make -j4
+	./configure --prefix=$(HOME)/lophilo-bin --openssl-use-sys=OPENSSL_USE_SYS --dest-cpu=arm --without-ssl --without-snapshot  
+
+zlib:
+	(cd ${HOME}/upstream/zlib;./configure --prefix ${ZLIB_INSTALL}; make;make install)
+
+build:
+	make -j`getconf _NPROCESSORS_ONLN`
+
+install:
+	mkdir -p ${NODE_INSTALLER}
+	cp -r out/Release/* tools/ ./config.gypi  ${NODE_INSTALLER}
+	cd ${NODE_INSTALLER}; git add .; git commit -m "node installer update for arm"; git push
+	@echo "on target, cd $$HOME/lophilo-bin/installer/arm; git pull; ./node tools/installer.js ./config.gypi install"
+
+local_install:
+	make install
