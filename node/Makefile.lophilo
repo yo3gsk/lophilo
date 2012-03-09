@@ -1,0 +1,12 @@
+.PHONY: deps node
+
+all:
+	@echo "choose deps or node"
+deps:
+	@echo "installing packages"
+	sudo apt-get install python
+
+node:
+	@echo "configuring and making node"
+	./configure --prefix=$(HOME)/lophilo-bin --openssl-use-sys=OPENSSL_USE_SYS
+	make -j4
