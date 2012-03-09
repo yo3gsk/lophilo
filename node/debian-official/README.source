@@ -1,0 +1,15 @@
+git-buildpackage
+================
+
+*.orig files in pristine tarball
+--------------------------------
+
+Upstream tarball sometimes contains *.orig files that are left over by
+upstream patches. Since dh_clean will remove them, they are protected
+by using DEB_CLEAN_EXCLUDE in debian/rules.
+
+debian/control.in
+-----------------
+
+debian/control is generated from debian/control.in, to update it, run :
+DEB_MAINTAINER_MODE=1 fakeroot debian/rules clean
