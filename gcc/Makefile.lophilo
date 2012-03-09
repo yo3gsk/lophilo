@@ -9,7 +9,7 @@ config:
 		--enable-languages=c,c++ \
 		--with-cpu=armv5te --with-tune=arm926ej-s \
 		--with-float=softfp \
-		--prefix=${HOME}/lophilo/gcc \
+		--prefix=${HOME}/lophilo-bin/gcc \
 		--target=arm-linux-gnueabi \
 		--program-prefix=arm-linux-gnueabi-
 

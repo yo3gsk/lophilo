@@ -1,11 +1,14 @@
+#CROSS_COMPILE=arm-linux-gnueabi-
+CROSS_COMPILE=${HOME}/arm-2011.09/bin/arm-none-linux-gnueabi-
 all:
-	arm-linux-gnueabi-gcc -mlittle-endian -Wall -mno-thumb-interwork -mabi=aapcs-linux -mfloat-abi=soft -march=armv5te -mtune=arm926ej-s -msoft-float -Uarm -static helloworld.c -o helloworld
+	${CROSS_COMPILE}gcc -mlittle-endian -Wall -mno-thumb-interwork -mabi=aapcs-linux -mfloat-abi=soft -march=armv5te -mtune=arm926ej-s -msoft-float -Uarm -static helloworld.c -o helloworld
 
 install:
-	cp helloworld /exports/busybox
+	cp helloworld /exports/squeeze/home/rngadam/
 
 objdump:
-	arm-linux-gnueabi-objdump -x helloworld
+	${CROSS_COMPILE}objdump -x helloworld
 
-elf:
+test:
+	@echo "make sure that the string below is v5!"
 	readelf -A helloworld

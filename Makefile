@@ -13,9 +13,9 @@ linux:
 	sudo mount -t aufs -o br=${LOPHILO}/linux:${UPSTREAM}/linux none ${LOPHILO}/linux-aufs
 
 nodejs:
-	#mkdir -p ${LOPHILO}/node-aufs
-	#sudo mount -t aufs -o br=${LOPHILO}/node:${UPSTREAM}/node none ${LOPHILO}/node-aufs
-	cp -rsu ${UPSTREAM}/node ${LOPHILO}
+	# node.js tries to write to the config files...
+	mkdir -p ${LOPHILO}/node-aufs
+	sudo mount -t aufs -o br=${LOPHILO}/node:${UPSTREAM}/node none ${LOPHILO}/node-aufs
 
 qemu:
 	cp -rsu ${UPSTREAM}/qemu ${LOPHILO}

@@ -1,6 +1,6 @@
 export TODAY:=$(shell date +%Y%m%d)
 export VERSION:=$(shell make -s -C ${SOURCE} kernelversion)
-export IMAGE=${HOME}/lophilo-bin/linux/versatilepb/vmlinux.arm.3.3.0-rc1.20120307-1331113585
+export IMAGE=${HOME}/lophilo-bin/linux/versatilepb/zImage.arm.latest
 export ARM_TEST=${HOME}/upstream/arm-test
 export INITRD=${ARM_TEST}/arm_root.img
 export QEMU=${HOME}/lophilo-bin/bin/qemu-system-arm
