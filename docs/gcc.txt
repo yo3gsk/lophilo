@@ -1,0 +1,8 @@
+sudo apt-get install gcc-4.4-arm-linux-gnueabi
+ln -s `which arm-linux-gnueabi-gcc-4.4` $HOME/lophilo/bin/arm-linux-gnueabi-gcc
+
+= Code Sourcery version =
+
+direct link:
+
+https://sourcery.mentor.com/sgpp/lite/arm/portal/release2032

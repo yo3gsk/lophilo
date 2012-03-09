@@ -1,0 +1,67 @@
+PROBLEM #1: missing mach/io.h
+
+In file included from include/linux/scatterlist.h:8,
+                 from include/linux/kfifo.h:56,
+                 from /home/rngadam/lophilo/cdev/lophilo.c:13:
+/usr/src/linux-headers-3.3.0-rc1/arch/arm/include/asm/io.h:112:21: error: mach/io.h: No such file or directory
+
+PROBLEM #2: missing mach/timex.h
+
+In file included from include/linux/timex.h:174,
+                 from include/linux/jiffies.h:8,
+                 from include/linux/ktime.h:25,
+                 from include/linux/timer.h:5,
+                 from include/linux/workqueue.h:8,
+                 from include/linux/kmod.h:26,
+                 from include/linux/module.h:13,
+                 from /home/rngadam/lophilo/cdev/lophilo.c:5:
+/usr/src/linux-headers-3.3.0-rc1/arch/arm/include/asm/timex.h:15:24: error: mach/timex.h: No such file or directory
+
+
+In file included from include/linux/ktime.h:25,
+                 from include/linux/timer.h:5,
+                 from include/linux/workqueue.h:8,
+                 from include/linux/kmod.h:26,
+                 from include/linux/module.h:13,
+                 from /home/rngadam/lophilo/cdev/lophilo.c:5:
+
+include/linux/jiffies.h:257:31: warning: "CLOCK_TICK_RATE" is not defined
+
+#if !((((NSEC_PER_SEC << 2) / TICK_NSEC) << (SEC_JIFFIE_SC - 2)) & 0x80000000)
+
+
+= NOT SUPPORTED! =
+
+http://help.lockergnome.com/linux/Bug-560738-make-kpkg-install-architecture-dependant-headers--ftopict511253.html
+
+
+= hacking =
+
+sudo tar cvfz /exports/squeeze/root/mach-versatile.tgz arch/arm/mach-versatile/include/
+
+cd /usr/src/linux-headers-3.3.0-rc1/
+
+ln -s arch/arm/mach-versatile/include/mach/ arch/arm/include/ 
+
+= fixdeps is x86.... =
+
+
+scripts/basic/fixdep: 1: Syntax error: word unexpected (expecting ")")
+make[2]: *** [/home/rngadam/lophilo/cdev/lophilo.o] Error 2
+make[1]: *** [_module_/home/rngadam/lophilo/cdev] Error 2
+make[1]: Leaving directory `/usr/src/linux-headers-3.3.0-rc1'
+
+sudo tar cvfz /exports/squeeze/root/scripts.tgz scripts/basic scripts/mod
+
+cd /lib/modules/`uname -r`/build
+
+tar xvfz scripts.tgz
+cd scripts/basic
+gcc -I /lib/modules/`uname -r`/build/include fixdep.c -o fixdep
+
+cd scripts/mod
+gcc -I /lib/modules/`uname -r`/build/include modpost.c file2alias.c sumversion.c -o modpost
+
+
+= modpost is x86 =
+
