@@ -1,0 +1,9 @@
+export PATH:=${HOME}/lophilo/codesourcery:${PATH}
+
+.PHONY: configure build
+
+configure:
+	./Configure linux-armv4
+
+build:
+	make -j`getconf _NPROCESSORS_ONLN`

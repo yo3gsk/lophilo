@@ -1,7 +1,7 @@
 UPSTREAM=${HOME}/upstream
 LOPHILO=${HOME}/lophilo
 
-.PHONY: qemu linux
+.PHONY: qemu linux all nodejs upstream openssl
 
 all: linux qemu
 
@@ -23,3 +23,7 @@ qemu:
 upstream:
 	mkdir -p ${UPSTREAM}
 	sudo mount -t nfs cnshaqs10:/home/rngadam/upstream ${UPSTREAM}
+
+openssl:
+	mkdir -p ${LOPHILO}/openssl-aufs
+	sudo mount -t aufs -o br=${LOPHILO}/openssl:${UPSTREAM}/openssl none ${LOPHILO}/openssl-aufs
