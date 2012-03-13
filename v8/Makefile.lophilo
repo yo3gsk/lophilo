@@ -1,0 +1,26 @@
+DEBPKG_NAME=lophilo-v8_3.8.1_armel.deb
+DEBPKG_PREFIX=./debian/usr/lib 
+
+# https://code.google.com/p/v8/wiki/CrossCompilingForARM
+V8DIR=.
+export CXXFLAGS+=-Wno-unused-but-set-variable -Wno-unknown-warning 
+
+.PHONY: build
+
+${V8DIR}/src/snapshot.cc:
+	@echo "proceeding with snapshot (step 1, host build)"
+	scons -Y${V8DIR} simulator=arm snapshot=on
+	mv obj/release/snapshot.cc ${V8DIR}/src/snapshot.cc
+
+build: ${V8DIR}/src/snapshot.cc
+	@echo "proceeding with build (step 2, arm build)"
+	scons wordsize=32 snapshot=nobuild arch=arm sample=shell env=PATH:${HOME}/lophilo/codesourcery:${PATH} library=shared
+
+debpkg:
+	rm -fr ${DEBPKG_PREFIX}
+	mkdir -p ${DEBPKG_PREFIX}
+	cp libv8.so ${DEBPKG_PREFIX}
+	fakeroot dpkg-deb --build debian ${DEBPKG_NAME} 
+	dpkg-sig -k 37FC6E55 --sign builder ${DEBPKG_NAME}
+	sudo reprepro --basedir /var/www/repos/apt/debian includedeb squeeze ${DEBPKG_NAME}
+	rm -f ${DEBPKG_NAME}

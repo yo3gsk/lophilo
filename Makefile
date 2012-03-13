@@ -1,7 +1,7 @@
 UPSTREAM=${HOME}/upstream
 LOPHILO=${HOME}/lophilo
 
-.PHONY: qemu linux all nodejs upstream openssl
+.PHONY: qemu linux all nodejs upstream openssl v8
 
 all: linux qemu
 
@@ -27,3 +27,7 @@ upstream:
 openssl:
 	mkdir -p ${LOPHILO}/openssl-aufs
 	sudo mount -t aufs -o br=${LOPHILO}/openssl:${UPSTREAM}/openssl none ${LOPHILO}/openssl-aufs
+
+v8:
+	mkdir -p ${LOPHILO}/v8-aufs
+	sudo mount -t aufs -o br=${LOPHILO}/v8:${UPSTREAM}/v8 none ${LOPHILO}/v8-aufs

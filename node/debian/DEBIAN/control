@@ -1,9 +1,9 @@
 Package: lophilo-nodejs
-Version: 0.7.5-1
+Version: 0.7.5-3
 Section: base
 Priority: optional
 Architecture: armel
-Depends: libssl-dev
+Depends: libssl-dev, lophilo-v8
 Maintainer: Ricky Ng-Adam (rngadam@lophilo.com)
 Description: Custom Node.JS for the Lophilo development platform
   Executes Javascript!

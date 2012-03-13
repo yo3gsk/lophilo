@@ -1,8 +1,14 @@
-export PATH:=${HOME}/lophilo/codesourcery:${PATH}
+DEBPKG_NAME=lophilo-nodejs_0.7.5_armel.deb
+DEBPKG_PREFIX=./debian/usr 
+
+OPENSSL_DIR=${HOME}/lophilo/openssl-aufs
+V8_DIR=${HOME}/lophilo/v8-aufs
+ZLIB_DIR=${HOME}/upstream/zlib
 ZLIB_INSTALL:=${HOME}/lophilo/node/zlib
+
+export CXXFLAGS+=-I${OPENSSL_DIR}/include -I${V8_DIR}/include -I${ZLIB_DIR}
 export LDFLAGS:=-L${ZLIB_INSTALL}/lib -L${HOME}/lophilo/openssl-aufs
-export NODE_INSTALLER:=${HOME}/lophilo-bin/installer/arm
-export CXXFLAGS+=-I${HOME}/lophilo/openssl-aufs/include
+export PATH:=${HOME}/lophilo/codesourcery:${PATH}
 
 .PHONY: deps node install build zlib config debian
 
@@ -12,41 +18,38 @@ deps:
 	@echo "installing packages"
 	sudo apt-get install python
 
-debian-config:
-	./configure --prefix=./debian/usr --dest-cpu=arm --without-snapshot --openssl-libpath=${HOME}/lophilo/openssl --openssl-includes=${HOME}/lophilo/openssl/include --openssl-use-sys=OPENSSL_USE_SYS
-
-debian-pkg:
-	# don't use the ARM node!!
-	node tools/installer.js ./config.gypi install
-	mkdir -p ./debian/usr/lib/node_modules/lophilo
-	cp ../lophilo-node/lophilo.js ../lophilo-node/lophilo
-	cp ../lophilo-node/lophilo.js ../lophilo-node/package.json ./debian/usr/lib/node_modules/lophilo
-	fakeroot dpkg-deb --build debian
-	mv debian.deb lophilo-nodejs.deb
-	cp lophilo-nodejs.deb /exports/squeeze/home/rngadam
-	
-config:
+debconfig:
 	@echo "configuring and making node"
-	./configure --prefix=$(HOME)/lophilo-bin --openssl-use-sys=OPENSSL_USE_SYS --dest-cpu=arm --without-ssl --without-snapshot  
+	./configure \
+		--prefix=${DEBPKG_PREFIX} \
+		--dest-cpu=arm \
+		--openssl-libpath=${OPENSSL_DIR}\
+		--openssl-includes=${OPENSSL_DIR}/include \
+		--openssl-use-sys=OPENSSL_USE_SYS \
+		--shared-v8 \
+		--shared-v8-libpath=${V8_DIR} \
+		--shared-v8-includes=${V8_DIR}/include \
+		--shared-zlib \
+		--shared-zlib-libpath=${ZLIB_DIR} \
+		--shared-zlib-includes=${ZLIB_DIR}
 
+debpkg:
+	# don't use the ARM node to install, but the natively build one...
+	rm -fr ${DEBPKG_PREFIX}
+	mkdir -p ${DEBPKG_PREFIX}
+	node tools/installer.js ./config.gypi install
+	fakeroot dpkg-deb --build debian ${DEBPKG_NAME} 
+	# set the repo with http://wiki.debian.org/SettingUpSignedAptRepositoryWithReprepro
+	dpkg-sig -k 37FC6E55 --sign builder ${DEBPKG_NAME}
+	sudo reprepro --basedir /var/www/repos/apt/debian includedeb squeeze ${DEBPKG_NAME}
+	rm -f ${DEBPKG_NAME}
+	
 zlib:
 	(cd ${HOME}/upstream/zlib;./configure --prefix ${ZLIB_INSTALL}; make;make install)
 
 build:
-	time make -j`getconf _NPROCESSORS_ONLN`
-
-install:
-	# don't use the ARM node!!
-	node tools/installer.js ./config.gypi install
-
-install_copy:
-	cp node /exports/squeeze/home/rngadam/lophilo-bin/bin
-
-install_dumb:
-	mkdir -p ${NODE_INSTALLER}
-	cp -r out/Release/* tools/ ./config.gypi  ${NODE_INSTALLER}
-	cd ${NODE_INSTALLER}; git add .; git commit -m "node installer update for arm"; git push
-	@echo "on target, cd $$HOME/lophilo-bin/installer/arm; git pull; ./node tools/installer.js ./config.gypi install"
+	#time make -j`getconf _NPROCESSORS_ONLN`
+	time make -j8 V=1
 
 local_install:
 	make install
