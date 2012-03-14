@@ -6,6 +6,8 @@ V8_DIR=${HOME}/lophilo/v8-aufs
 ZLIB_DIR=${HOME}/upstream/zlib
 ZLIB_INSTALL:=${HOME}/lophilo/node/zlib
 
+OBJDUMP:=${HOME}/lophilo/codesourcery/objdump
+
 export CXXFLAGS+=-I${OPENSSL_DIR}/include -I${V8_DIR}/include -I${ZLIB_DIR}
 export LDFLAGS:=-L${ZLIB_INSTALL}/lib -L${HOME}/lophilo/openssl-aufs
 export PATH:=${HOME}/lophilo/codesourcery:${PATH}
@@ -50,9 +52,21 @@ zlib:
 build:
 	#time make -j`getconf _NPROCESSORS_ONLN`
 	time make -j8 V=1
+	# sanity check...
+	cp node /exports/squeeze/home/rngadam
 
 local_install:
 	make install
 
 clean:
 	make clean
+
+node.asm: node
+	${OBJDUMP} -d $< > $@
+
+node.neon: node.asm Makefile.lophilo
+	-egrep ".*movw.*<" $< > $@
+
+test: node.neon Makefile.lophilo
+	# test that the file is empty...
+	test ! -s $<

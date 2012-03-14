@@ -1,4 +1,4 @@
-DEBPKG_NAME:=lophilo-v8_3.8.1_armel.deb
+DEBPKG_NAME:=lophilo-v8_3.9.7_armel.deb
 DEBPKG_PREFIX:=./debian/usr/lib 
 OBJDUMP:=${HOME}/lophilo/codesourcery/objdump
 
@@ -8,14 +8,24 @@ export CXXFLAGS+=-Wno-unused-but-set-variable -Wno-unknown-warning
 
 .PHONY: build clean debpkg test
 
+all:
+	@echo "valid targets: build clean debpkg test"
+
+# the compile is two steps: 
+# 1) we generate a host-runnable, host-compiler build that can
+# simulate arm and generate the snapshot
+# 2) we build using the cross-compiler
+# some common settings
+# vfp3 off is how v8 figures out it's not arm7...
 ${V8DIR}/src/snapshot.cc:
 	@echo "proceeding with snapshot (step 1, host build)"
-	scons -Y${V8DIR} simulator=arm snapshot=on
+	scons -Y${V8DIR} wordsize=32 vfp3=off armeabi=soft simulator=arm snapshot=on
 	mv obj/release/snapshot.cc ${V8DIR}/src/snapshot.cc
 
 build: ${V8DIR}/src/snapshot.cc
 	@echo "proceeding with build (step 2, arm build)"
-	scons -j8 wordsize=32 snapshot=nobuild arch=arm sample=shell env=PATH:${HOME}/lophilo/codesourcery:${PATH} library=shared 
+	time scons -j8 wordsize=32 vfp3=off armeabi=soft snapshot=nobuild arch=arm sample=shell env=PATH:${HOME}/lophilo/codesourcery:${PATH} library=shared 
+	cp libv8.so /exports/squeeze/home/rngadam
 
 debpkg:
 	rm -fr ${DEBPKG_PREFIX}
@@ -33,7 +43,7 @@ libv8.so.asm: libv8.so
 	${OBJDUMP} -d $< > $@
 
 libv8.so.neon: libv8.so.asm Makefile.lophilo
-	-egrep ".*movw.*<" $< > $@
+	-egrep ".*movw.*" $< > $@
 
 test: libv8.so.neon Makefile.lophilo
 	# test that the file is empty...

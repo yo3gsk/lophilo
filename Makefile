@@ -3,7 +3,10 @@ LOPHILO=${HOME}/lophilo
 
 .PHONY: qemu linux all nodejs upstream openssl v8
 
-all: linux qemu
+all: 
+	@echo "mount disks with `make aufs`"
+
+aufs: linux nodejs openssl v8
 
 linux:
 	# make-kpkg packages symlinks... and has no option

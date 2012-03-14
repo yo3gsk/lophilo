@@ -7,21 +7,26 @@ export CCACHE_SLOPPINESS="time_macros file_macro include_file_mtime"
 export PLATFORM_FLAGS="-mlittle-endian -mno-thumb-interwork -mabi=aapcs-linux -mfloat-abi=soft -march=armv5te -mtune=arm926ej-s -msoft-float -Uarm"
 export CROSS_COMPILE="/opt/codesourcery/arm-2011.09/bin/arm-none-linux-gnueabi-"
 
-if [ -z "CCACHE_DIR" ]; then
+if [ -z "$CCACHE_DIR" ]; then
 	export CXX="${CROSS_COMPILE}g++"
 	export CC="${CROSS_COMPILE}gcc"
+	echo "# CS compiler, ARM, !ccache, !distcc"
 else
 	export CXX="ccache ${CROSS_COMPILE}g++"
 	export CC="ccache ${CROSS_COMPILE}gcc"
+	echo "# CS compiler, ARM, ccache, distcc"
 fi
 
 # compile flags for target
 export CXXFLAGS="$PLATFORM_FLAGS" 
 export CFLAGS="$PLATFORM_FLAGS"
 export CPPFLAGS="$PLATFORM_FLAGS"
+export ASFLAGS="-mlittle-endian -mno-thumb-interwork -mfloat-abi=soft -march=armv5te -mcpu=arm926ej-s"
 
 # other executables
 export LD=${CROSS_COMPILE}ld
 export STRIP=${CROSS_COMPILE}strip
 export AR=${CROSS_COMPILE}ar
 export RANLIB=${CROSS_COMPILE}ranlib
+export AS=${CROSS_COMPILE}as
+export OBJDUMP=${CROSS_COMPILE}objdump
