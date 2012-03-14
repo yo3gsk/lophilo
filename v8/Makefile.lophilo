@@ -1,6 +1,7 @@
 DEBPKG_NAME:=lophilo-v8_3.9.7_armel.deb
 DEBPKG_PREFIX:=./debian/usr/lib 
 OBJDUMP:=${HOME}/lophilo/codesourcery/objdump
+ARM_TOOLCHAIN_PATH:=${HOME}/lophilo/codesourcery/arm926ej-s
 
 # https://code.google.com/p/v8/wiki/CrossCompilingForARM
 V8DIR=.
@@ -24,7 +25,7 @@ ${V8DIR}/src/snapshot.cc:
 
 build: ${V8DIR}/src/snapshot.cc
 	@echo "proceeding with build (step 2, arm build)"
-	time scons -j8 wordsize=32 vfp3=off armeabi=soft snapshot=nobuild arch=arm sample=shell env=PATH:${HOME}/lophilo/codesourcery:${PATH} library=shared 
+	time scons -j8 wordsize=32 vfp3=off armeabi=soft snapshot=nobuild arch=arm sample=shell env=PATH:${ARM_TOOLCHAIN_PATH}:${PATH} library=shared 
 	cp libv8.so /exports/squeeze/home/rngadam
 
 debpkg:
@@ -43,7 +44,7 @@ libv8.so.asm: libv8.so
 	${OBJDUMP} -d $< > $@
 
 libv8.so.neon: libv8.so.asm Makefile.lophilo
-	-egrep ".*movw.*" $< > $@
+	-egrep ".*movw.*<" $< > $@
 
 test: libv8.so.neon Makefile.lophilo
 	# test that the file is empty...

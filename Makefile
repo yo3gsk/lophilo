@@ -6,7 +6,7 @@ LOPHILO=${HOME}/lophilo
 all: 
 	@echo "mount disks with `make aufs`"
 
-aufs: linux nodejs openssl v8
+aufs: linux nodejs openssl v8 npm2debian
 
 linux:
 	# make-kpkg packages symlinks... and has no option
@@ -34,3 +34,8 @@ openssl:
 v8:
 	mkdir -p ${LOPHILO}/v8-aufs
 	sudo mount -t aufs -o br=${LOPHILO}/v8:${UPSTREAM}/v8 none ${LOPHILO}/v8-aufs
+
+npm2debian:
+	mkdir -p ${LOPHILO}/$@
+	mkdir -p ${LOPHILO}/$@-aufs
+	sudo mount -t aufs -o br=${LOPHILO}/$@:${UPSTREAM}/$@ none ${LOPHILO}/$@-aufs

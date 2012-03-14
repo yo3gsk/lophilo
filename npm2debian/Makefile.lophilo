@@ -13,6 +13,7 @@ install:
 	# version 0.3.x not in repo...
 	git clone https://github.com/veged/coa.git node_modules/coa
 	npm install rimraf q q-fs qq path util semver
+	npm link npm
 
 socket.io:
 	PATH=${ARM_TOOLCHAIN_PATH}:${PATH} ./bin/npm2debian --versioned $@

@@ -1,4 +1,4 @@
-DEBPKG_NAME=lophilo-nodejs_0.7.5_armel.deb
+DEBPKG_NAME=lophilo-nodejs_0.7.6_armel.deb
 DEBPKG_PREFIX=./debian/usr 
 
 OPENSSL_DIR=${HOME}/lophilo/openssl-aufs
@@ -6,11 +6,12 @@ V8_DIR=${HOME}/lophilo/v8-aufs
 ZLIB_DIR=${HOME}/upstream/zlib
 ZLIB_INSTALL:=${HOME}/lophilo/node/zlib
 
-OBJDUMP:=${HOME}/lophilo/codesourcery/objdump
+ARM_TOOLCHAIN_PATH:=${HOME}/lophilo/codesourcery/arm926ej-s
+OBJDUMP:=${ARM_TOOLCHAIN_PATH}/objdump
 
 export CXXFLAGS+=-I${OPENSSL_DIR}/include -I${V8_DIR}/include -I${ZLIB_DIR}
 export LDFLAGS:=-L${ZLIB_INSTALL}/lib -L${HOME}/lophilo/openssl-aufs
-export PATH:=${HOME}/lophilo/codesourcery:${PATH}
+export PATH:=${ARM_TOOLCHAIN_PATH}:${PATH}
 
 .PHONY: deps node install build zlib config debian
 
@@ -40,6 +41,12 @@ debpkg:
 	rm -fr ${DEBPKG_PREFIX}
 	mkdir -p ${DEBPKG_PREFIX}
 	node tools/installer.js ./config.gypi install
+	# this is symlinked to /usr/bin/npm...
+	chmod a+x debian/usr/lib/node_modules/npm/cli.js
+	# delete extraneous documentation
+	rm -fr debian/usr/lib/node_modules/npm/html
+	rm -fr debian/usr/lib/node_modules/npm/doc
+	rm -fr debian/usr/lib/node_modules/npm/man
 	fakeroot dpkg-deb --build debian ${DEBPKG_NAME} 
 	# set the repo with http://wiki.debian.org/SettingUpSignedAptRepositoryWithReprepro
 	dpkg-sig -k 37FC6E55 --sign builder ${DEBPKG_NAME}
@@ -53,7 +60,7 @@ build:
 	#time make -j`getconf _NPROCESSORS_ONLN`
 	time make -j8 V=1
 	# sanity check...
-	cp node /exports/squeeze/home/rngadam
+	#cp node /exports/squeeze/home/rngadam
 
 local_install:
 	make install
