@@ -1,0 +1,15 @@
+include ../lophilo.mk
+
+export EMAIL:="rngadam@lophilo.com"
+export DEBFULLNAME:="Ricky Ng-Adam"
+
+export PATH:=${ARM_TOOLCHAIN_PATH}:${PATH}
+
+.PHONY: install build socket.io
+
+install:
+	sudo apt-get install devscripts dh-make debhelper fakeroot dpkg-dev
+
+socket.io:
+	bin/npm2debian --versioned socket.io
+	cd npm-socket.io*; dpkg-buildpackage -rfakeroot
