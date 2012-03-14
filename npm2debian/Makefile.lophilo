@@ -3,13 +3,28 @@ include ../lophilo.mk
 export EMAIL:="rngadam@lophilo.com"
 export DEBFULLNAME:="Ricky Ng-Adam"
 
-export PATH:=${ARM_TOOLCHAIN_PATH}:${PATH}
 
-.PHONY: install build socket.io
+.PHONY: deps install socket.io
 
-install:
+deps:
 	sudo apt-get install devscripts dh-make debhelper fakeroot dpkg-dev
 
+install:
+	# version 0.3.x not in repo...
+	git clone https://github.com/veged/coa.git node_modules/coa
+	npm install rimraf q q-fs qq path util semver
+
 socket.io:
-	bin/npm2debian --versioned socket.io
-	cd npm-socket.io*; dpkg-buildpackage -rfakeroot
+	PATH=${ARM_TOOLCHAIN_PATH}:${PATH} ./bin/npm2debian --versioned $@
+	# dpkg-buildpackage -d to ignore dependencies...
+	cd npm-$@*; dpkg-buildpackage -d -rfakeroot
+
+semver:
+	PATH=${ARM_TOOLCHAIN_PATH}:${PATH} ./bin/npm2debian --versioned $@
+	# dpkg-buildpackage -d to ignore dependencies...
+	cd npm-$@*; dpkg-buildpackage -d -rfakeroot
+
+rimraf:
+	PATH=${ARM_TOOLCHAIN_PATH}:${PATH} ./bin/npm2debian --versioned $@
+	# dpkg-buildpackage -d to ignore dependencies...
+	cd npm-$@*; dpkg-buildpackage -d -rfakeroot
