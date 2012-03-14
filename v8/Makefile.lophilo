@@ -1,11 +1,12 @@
-DEBPKG_NAME=lophilo-v8_3.8.1_armel.deb
-DEBPKG_PREFIX=./debian/usr/lib 
+DEBPKG_NAME:=lophilo-v8_3.8.1_armel.deb
+DEBPKG_PREFIX:=./debian/usr/lib 
+OBJDUMP:=${HOME}/lophilo/codesourcery/objdump
 
 # https://code.google.com/p/v8/wiki/CrossCompilingForARM
 V8DIR=.
 export CXXFLAGS+=-Wno-unused-but-set-variable -Wno-unknown-warning 
 
-.PHONY: build
+.PHONY: build clean debpkg test
 
 ${V8DIR}/src/snapshot.cc:
 	@echo "proceeding with snapshot (step 1, host build)"
@@ -14,7 +15,7 @@ ${V8DIR}/src/snapshot.cc:
 
 build: ${V8DIR}/src/snapshot.cc
 	@echo "proceeding with build (step 2, arm build)"
-	scons wordsize=32 snapshot=nobuild arch=arm sample=shell env=PATH:${HOME}/lophilo/codesourcery:${PATH} library=shared
+	scons -j8 wordsize=32 snapshot=nobuild arch=arm sample=shell env=PATH:${HOME}/lophilo/codesourcery:${PATH} library=shared 
 
 debpkg:
 	rm -fr ${DEBPKG_PREFIX}
@@ -24,3 +25,16 @@ debpkg:
 	dpkg-sig -k 37FC6E55 --sign builder ${DEBPKG_NAME}
 	sudo reprepro --basedir /var/www/repos/apt/debian includedeb squeeze ${DEBPKG_NAME}
 	rm -f ${DEBPKG_NAME}
+
+clean:
+	make clean
+
+libv8.so.asm: libv8.so
+	${OBJDUMP} -d $< > $@
+
+libv8.so.neon: libv8.so.asm Makefile.lophilo
+	-egrep ".*movw.*<" $< > $@
+
+test: libv8.so.neon Makefile.lophilo
+	# test that the file is empty...
+	test ! -s $<

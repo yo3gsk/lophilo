@@ -1,0 +1,8 @@
+Package: lophilo-v8
+Version: 3.9.6-1
+Section: base
+Priority: optional
+Architecture: armel
+Maintainer: Ricky Ng-Adam (rngadam@lophilo.com)
+Description: Custom V8 Javascript interpreter for Lophilo
+  Executes Javascript!
