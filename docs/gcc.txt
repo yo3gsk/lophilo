@@ -6,3 +6,14 @@ ln -s `which arm-linux-gnueabi-gcc-4.4` $HOME/lophilo/bin/arm-linux-gnueabi-gcc
 direct link:
 
 https://sourcery.mentor.com/sgpp/lite/arm/portal/release2032
+
+dependencies:
+
+        linux-gate.so.1 =>  (0x00c0e000)
+        libm.so.6 => /lib/i386-linux-gnu/libm.so.6 (0x00752000)
+        libc.so.6 => /lib/i386-linux-gnu/libc.so.6 (0x00c31000)
+        /lib/ld-linux.so.2 (0x004a0000)
+
+= testing that no NEON assembly instructions are generated =
+
+../codesourcery/objdump -d libv8.so | grep movw

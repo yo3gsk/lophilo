@@ -128,3 +128,85 @@ adler32.c   contrib  crc32.h    deflate.h  infback.c  inffast.h   inflate.c  inf
 compress.c  crc32.c  deflate.c  gzio.c     inffast.c  inffixed.h  inflate.h  inftrees.h  mozzconf.h  trees.c          uncompr.c  zlib.gyp  zutil.c
 
 $ sudo apt-get install zlib1g-dev
+
+= openssl for arm =
+
+Missing opensslconf.h file:
+
+rngadam@cnshaqs10:~/lophilo/node-aufs$ makel build
+make -j`getconf _NPROCESSORS_ONLN`
+make[1]: Entering directory `/home/rngadam/lophilo/node-aufs'
+make -C out BUILDTYPE=Release
+make[2]: Entering directory `/home/rngadam/lophilo/node-aufs/out'
+  CC(target) /home/rngadam/lophilo/node-aufs/out/Release/obj.target/openssl/deps/openssl/openssl/ssl/bio_ssl.o
+  CC(target) /home/rngadam/lophilo/node-aufs/out/Release/obj.target/openssl/deps/openssl/openssl/ssl/d1_both.o
+In file included from ../deps/openssl/openssl/include/openssl/../../crypto/crypto.h:122:0,
+                 from ../deps/openssl/openssl/include/openssl/crypto.h:1,
+                 from ../deps/openssl/openssl/ssl/bio_ssl.c:63:
+../deps/openssl/openssl/e_os2.h:56:33: fatal error: openssl/opensslconf.h: No such file or directory
+compilation terminated.
+In file included from ../deps/openssl/openssl/ssl/ssl_locl.h:124:0,
+                 from ../deps/openssl/openssl/ssl/d1_both.c:119:
+../deps/openssl/openssl/e_os.h:62:33: fatal error: openssl/opensslconf.h: No such file or directory
+compilation terminated.
+make[2]: *** [/home/rngadam/lophilo/node-aufs/out/Release/obj.target/openssl/deps/openssl/openssl/ssl/d1_both.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[2]: *** [/home/rngadam/lophilo/node-aufs/out/Release/obj.target/openssl/deps/openssl/openssl/ssl/bio_ssl.o] Error 1
+make[2]: Leaving directory `/home/rngadam/lophilo/node-aufs/out'
+make[1]: *** [node] Error 2
+make[1]: Leaving directory `/home/rngadam/lophilo/node-aufs'
+make: *** [build] Error 2
+
+
+file exists as follows:
+
+rngadam@cnshaqs10:~/lophilo/node-aufs$ find . -name opensslconf.h
+./deps/openssl/config/k8/openssl/opensslconf.h
+./deps/openssl/config/piii/openssl/opensslconf.h
+
+checked out ssl and created openssl directory
+
+--openssl-libpath=${HOME}/lophilo/openssl --openssl-includes=${HOME}/lophilo/openssl
+
+
+= mksnapshot =
+
+uses ARM mksnapshot on x86 (incompatible with cross-compilation)
+
+$ makel build V=1
+time make -j`getconf _NPROCESSORS_ONLN`
+make[1]: Entering directory `/home/rngadam/lophilo/node-aufs'
+make -C out BUILDTYPE=Release
+make[2]: Entering directory `/home/rngadam/lophilo/node-aufs/out'
+  LD_LIBRARY_PATH=/home/rngadam/lophilo/node-aufs/out/Release/lib.host:/home/rngadam/lophilo/node-aufs/out/Release/lib.target:$LD_LIBR
+ARY_PATH; export LD_LIBRARY_PATH; cd ../deps/v8/tools/gyp; mkdir -p /home/rngadam/lophilo/node-aufs/out/Release/obj.target/v8_snapshot
+/geni; "/home/rngadam/lophilo/node-aufs/out/Release/mksnapshot" --log-snapshot-positions --logfile "/home/rngadam/lophilo/node-aufs/ou
+t/Release/obj.target/v8_snapshot/geni/snapshot.log" --noenable_armv7 --noenable_vfp3 "/home/rngadam/lophilo/node-aufs/out/Release/obj.
+target/v8_snapshot/geni/snapshot.cc"
+/home/rngadam/lophilo/node-aufs/out/Release/mksnapshot: 1: Syntax error: word unexpected (expecting ")")
+make[2]: *** [/home/rngadam/lophilo/node-aufs/out/Release/obj.target/v8_snapshot/geni/snapshot.cc] Error 2
+make[2]: Leaving directory `/home/rngadam/lophilo/node-aufs/out'
+make[1]: *** [node] Error 2
+make[1]: Leaving directory `/home/rngadam/lophilo/node-aufs'
+Command exited with non-zero status 2
+0.41user 0.10system 0:00.55elapsed 92%CPU (0avgtext+0avgdata 14672maxresident)k
+0inputs+2040outputs (0major+9799minor)pagefaults 0swaps
+make: *** [build] Error 2
+
+= openssl probing v7 instruction =
+
+root@squeeze1:/etc/apt/sources.list.d# gdb node
+(gdb) run
+Starting program: /usr/bin/node
+[Thread debugging using libthread_db enabled]
+
+Program received signal SIGILL, Illegal instruction.
+0x000e1980 in _armv7_neon_probe ()
+(gdb) bt
+#0  0x000e1980 in _armv7_neon_probe ()
+#1  0x00047490 in OPENSSL_cpuid_setup ()
+#2  0x001ba2d8 in __libc_csu_init ()
+#3  0xb68f74c4 in __libc_start_main () from /lib/libc.so.6
+#4  0x000474f8 in _start ()
+(gdb)
+

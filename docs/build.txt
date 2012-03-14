@@ -1,4 +1,4 @@
-apt-get install distcc distcc-pump
+sudo apt-get install distcc distcc-pump
 
 edit 
 

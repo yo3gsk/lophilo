@@ -43,3 +43,7 @@ git clone git@cnshaqs11:gitolite-admin (git clone git@localhost:gitolite-admin)
 ...add keydir and conf
 
 git config remote.origin.url git@cnshaqs11:etc
+
+= changing lophilo origin to correct one =
+
+git remote set-url origin git@cnshaqs11:lophilo

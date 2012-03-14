@@ -1,0 +1,9 @@
+ulimit -c unlimited
+$ node
+Illegal instruction (core dumped)
+gdb node core
+#0  0x38c2fcc8 in ?? ()
+(gdb) x/1i 0x38c2fcc8
+0x38c2fcc8:     movw    r1, #52620      ; 0xcd8c
+
+x/i $pc
