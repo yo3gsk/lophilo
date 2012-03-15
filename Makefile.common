@@ -1,7 +1,7 @@
 LOPHILO_DIR:=$(shell realpath $(shell dirname $(shell pwd)/../..))
 GPG_KEY=37FC6E55 
 ifndef LOPHILO_TARGET_ARCH
-	LOPHILO_TARGET_ARCH:=arm
+	LOPHILO_TARGET_ARCH:=ia32
 endif
 
 ifeq ($(LOPHILO_TARGET_ARCH),arm)

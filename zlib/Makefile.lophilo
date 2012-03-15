@@ -9,7 +9,7 @@ config:
 	./configure
 
 build: 
-	make
+	make -j8
 
 clean:
 	make clean
