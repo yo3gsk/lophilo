@@ -1,0 +1,10 @@
+.PHONY: deb-pkg all
+
+all:
+	@echo "target deb-pkg..."
+
+debpkg:
+	fakeroot dpkg-deb --build debian codesourcery-arm-2011.09.deb
+
+install:
+	find  .. -maxdepth 1 -executable -type f -exec ln -s {} . \;
