@@ -6,7 +6,7 @@ LOPHILO_DIR=.
 all: 
 	@echo "mount disks with `make aufs`"
 
-aufs: linux nodejs openssl v8 npm2debian zlib
+aufs: linux nodejs openssl v8 npm2debian zlib qemu
 
 linux:
 	# make-kpkg packages symlinks... and has no option
@@ -21,7 +21,9 @@ nodejs:
 	sudo mount -t aufs -o br=${LOPHILO_DIR}/node:${UPSTREAM}/node none ${LOPHILO_DIR}/node-aufs
 
 qemu:
-	cp -rsu ${UPSTREAM}/qemu ${LOPHILO_DIR}
+	mkdir -p ${LOPHILO_DIR}/$@
+	mkdir -p ${LOPHILO_DIR}/$@-aufs
+	sudo mount -t aufs -o br=${LOPHILO_DIR}/$@:${UPSTREAM}/$@ none ${LOPHILO_DIR}/$@-aufs
 
 upstream:
 	mkdir -p ${UPSTREAM}

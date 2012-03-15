@@ -1,0 +1,9 @@
+Package: lophilo-qemu
+Version: 1.0.1-2
+Section: base
+Priority: optional
+Architecture: i386
+Conflicts: qemu-kvm
+Maintainer: Ricky Ng-Adam (rngadam@lophilo.com)
+Description: ARM emulator for the target platform
+  Runs Lophilo software stack!
