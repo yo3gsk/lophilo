@@ -10,3 +10,25 @@ see tests/ directory
 
 unstripped: 6.9M
 stripped: 5.1M
+
+= startup time =
+
+without
+root@squeeze1:~# time node -e 'console.log(process.argv)'
+[ '/root/node' ]
+
+real    0m1.739s
+user    0m1.480s
+sys     0m0.250s
+root@squeeze1:~# time node -e 'console.log(process.argv)'
+[ '/root/node' ]
+
+real    0m1.905s
+user    0m1.570s
+sys     0m0.300s
+root@squeeze1:~# time node -e 'console.log(process.argv)'
+[ '/root/node' ]
+
+real    0m1.813s
+user    0m1.540s
+sys     0m0.270s
