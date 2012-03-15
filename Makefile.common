@@ -1,13 +1,17 @@
 LOPHILO_DIR:=$(shell realpath $(shell dirname $(shell pwd)/../..))
-
+GPG_KEY=37FC6E55 
 ifndef LOPHILO_TARGET_ARCH
 	LOPHILO_TARGET_ARCH:=arm
 endif
 
 ifeq ($(LOPHILO_TARGET_ARCH),arm)
 	TOOLCHAIN_PATH:=${LOPHILO_DIR}/codesourcery/arm926ej-s
+	DEB_REPO:=debian
+	DEB_CODENAME:=squeeze
 else
 	TOOLCHAIN_PATH:=${LOPHILO_DIR}/codesourcery/i686
+	DEB_REPO:=ubuntu
+	DEB_CODENAME:=oneiric
 endif
 
 export PATH:=${TOOLCHAIN_PATH}:${PATH}
