@@ -26,3 +26,7 @@ the etckeeper local repo is independent and you just cherry-pick from git@cnshaq
 
  cpufreq-utils cpufreq-info
 
+
+= development packages =
+
+binutils-doc gcc-4.4-locales libmudflap0-4.4-dev-armel-cross gcc-4.4-doc libgcc1-dbg-armel-cross libgomp1-dbg-armel-crosslibmudflap0-dbg-armel-cross libcloog-ppl0 libppl-c2 libppl7
