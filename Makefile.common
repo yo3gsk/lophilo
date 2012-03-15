@@ -1,0 +1,13 @@
+LOPHILO_DIR:=$(shell realpath $(shell dirname $(shell pwd)/../..))
+
+ifndef LOPHILO_TARGET_ARCH
+	LOPHILO_TARGET_ARCH:=arm
+endif
+
+ifeq ($(LOPHILO_TARGET_ARCH),arm)
+	TOOLCHAIN_PATH:=${LOPHILO_DIR}/codesourcery/arm926ej-s
+else
+	TOOLCHAIN_PATH:=${LOPHILO_DIR}/codesourcery/i686
+endif
+
+export PATH:=${TOOLCHAIN_PATH}:${PATH}

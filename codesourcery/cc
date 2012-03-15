@@ -1,1 +1,3 @@
-gcc
+. `dirname $0`/common.sh  
+exec $CC $CFLAGS "$@"
+ 

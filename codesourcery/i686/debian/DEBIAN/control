@@ -1,0 +1,9 @@
+Package: codesourcery-ia32
+Version: 2011.09-1
+Section: base
+Priority: optional
+Architecture: i386
+Depends: libc6
+Maintainer: Ricky Ng-Adam (rngadam@lophilo.com)
+Description: Codesourcery cross-compiler Intel/Linux
+	https://sourcery.mentor.com/sgpp/lite/ia32/portal/release2032

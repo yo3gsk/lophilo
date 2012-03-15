@@ -1,0 +1,15 @@
+include ../Makefile.common
+
+all:
+	@echo "LOPHILO_DIR: ${LOPHILO_DIR}"
+	@echo "PATH: ${PATH}"
+	which cc
+
+config:
+	./configure
+
+build: 
+	make
+
+clean:
+	make clean

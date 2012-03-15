@@ -1,1 +1,3 @@
-g++
+. `dirname $0`/common.sh  
+exec $CXX $CXXFLAGS "$@"
+ 

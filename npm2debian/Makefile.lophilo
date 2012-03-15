@@ -15,17 +15,20 @@ install:
 	npm install rimraf q q-fs qq path util semver
 	npm link npm
 
-socket.io:
-	PATH=${ARM_TOOLCHAIN_PATH}:${PATH} ./bin/npm2debian --versioned $@
-	# dpkg-buildpackage -d to ignore dependencies...
-	cd npm-$@*; dpkg-buildpackage -d -rfakeroot
+registry-deps:
+	# https://blog.caurea.org/2012/01/31/local-npm-registry-mirror.html
+	sudo apt-get install couchdb
+	npm install -g replicate
+	git clone https://github.com/isaacs/npmjs.org.git
+	# edit /etc/couchdb/local.ini 
+	# sudo service couchdb restart
+	cd npmjs.org
 
-semver:
-	PATH=${ARM_TOOLCHAIN_PATH}:${PATH} ./bin/npm2debian --versioned $@
-	# dpkg-buildpackage -d to ignore dependencies...
-	cd npm-$@*; dpkg-buildpackage -d -rfakeroot
+set-password:
+	curl -X PUT http://localhost:5984/_config/admins/admin -d '"secret"'
+	curl -X PUT http://admin:secret@localhost:5984/registry
 
-rimraf:
-	PATH=${ARM_TOOLCHAIN_PATH}:${PATH} ./bin/npm2debian --versioned $@
-	# dpkg-buildpackage -d to ignore dependencies...
-	cd npm-$@*; dpkg-buildpackage -d -rfakeroot
+update-mirror:
+	npm install -g replicate
+	replicate http://isaacs.iriscouch.com/registry \
+	          http://admin:secret@localhost:5984/registry

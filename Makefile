@@ -1,12 +1,12 @@
 UPSTREAM=${HOME}/upstream
 LOPHILO=${HOME}/lophilo
 
-.PHONY: qemu linux all nodejs upstream openssl v8
+.PHONY: qemu linux all nodejs upstream openssl v8 npm2debian zlib
 
 all: 
 	@echo "mount disks with `make aufs`"
 
-aufs: linux nodejs openssl v8 npm2debian
+aufs: linux nodejs openssl v8 npm2debian zlib
 
 linux:
 	# make-kpkg packages symlinks... and has no option
@@ -36,6 +36,11 @@ v8:
 	sudo mount -t aufs -o br=${LOPHILO}/v8:${UPSTREAM}/v8 none ${LOPHILO}/v8-aufs
 
 npm2debian:
+	mkdir -p ${LOPHILO}/$@
+	mkdir -p ${LOPHILO}/$@-aufs
+	sudo mount -t aufs -o br=${LOPHILO}/$@:${UPSTREAM}/$@ none ${LOPHILO}/$@-aufs
+
+zlib:
 	mkdir -p ${LOPHILO}/$@
 	mkdir -p ${LOPHILO}/$@-aufs
 	sudo mount -t aufs -o br=${LOPHILO}/$@:${UPSTREAM}/$@ none ${LOPHILO}/$@-aufs
