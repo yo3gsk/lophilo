@@ -1,12 +1,12 @@
 UPSTREAM=${HOME}/upstream
 LOPHILO_DIR=.
 
-.PHONY: qemu linux all nodejs upstream openssl v8 npm2debian zlib
+.PHONY: qemu linux all nodejs upstream openssl v8 npm2debian zlib build-couchdb
 
 all: 
 	@echo "mount disks with `make aufs`"
 
-aufs: linux nodejs openssl v8 npm2debian zlib qemu
+aufs: linux nodejs openssl v8 npm2debian zlib qemu build-couchdb
 
 linux:
 	# make-kpkg packages symlinks... and has no option
@@ -43,6 +43,11 @@ npm2debian:
 	sudo mount -t aufs -o br=${LOPHILO_DIR}/$@:${UPSTREAM}/$@ none ${LOPHILO_DIR}/$@-aufs
 
 zlib:
+	mkdir -p ${LOPHILO_DIR}/$@
+	mkdir -p ${LOPHILO_DIR}/$@-aufs
+	sudo mount -t aufs -o br=${LOPHILO_DIR}/$@:${UPSTREAM}/$@ none ${LOPHILO_DIR}/$@-aufs
+
+build-couchdb:
 	mkdir -p ${LOPHILO_DIR}/$@
 	mkdir -p ${LOPHILO_DIR}/$@-aufs
 	sudo mount -t aufs -o br=${LOPHILO_DIR}/$@:${UPSTREAM}/$@ none ${LOPHILO_DIR}/$@-aufs

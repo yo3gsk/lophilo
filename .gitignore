@@ -1,0 +1,10 @@
+*.o
+*.deb
+.*.cmd
+.*.aufs
+*.a
+*.pc
+*.ko
+*-aufs
+*.lo
+*.so
