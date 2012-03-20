@@ -1,0 +1,6 @@
+{
+  "maxdepth":2,
+  "2":["leaf"],
+  "1":["direct", "devdirect"],
+  "0":["root"]
+}

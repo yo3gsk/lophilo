@@ -35,18 +35,38 @@ dependencies = {
   },
 };
 
-console.log(dumpversion.createMakefile('', tree, dependencies, tree.maxdepth));
+function test_createMakefile() {
+  deferred = Q.defer();
+  setTimeout(function() { deferred.resolve(true); }, 500);
+  console.log(dumpversion.createMakefile(
+      '', 
+      tree, 
+      dependencies, 
+      tree.maxdepth));
+  return deferred.promise;
+}
 
-promise = dumpversion.debianizeSublevel(
-    tree, 
-    tree.maxdepth, 
-    dependencies, 
-    function(a, o) {
-      console.log('debianizing ' + a); 
-    }, 
-    function(name) {
-      console.log('looking up name ' + name); 
-      return dependencies[name]['pkgdir'];
-    }
-    );
-promise.wait();
+function test_debianizeSubLevel() {
+    return dumpversion.debianizeSublevel(
+        tree, 
+        tree.maxdepth, 
+        dependencies, 
+        function(a, o) {
+          deferred = Q.defer();
+          setTimeout(function() { deferred.resolve(true); }, 500);
+          console.log('debianizing ' + a); 
+          return deferred.promise;
+        }, 
+        function(name) {
+          console.log('looking up name ' + name); 
+          return dependencies[name]['pkgdir'];
+        });
+}
+require('coa').Cmd()
+  .act(function(opts, args) {
+    return Q.step(
+      test_createMakefile,  
+      test_debianizeSubLevel
+      )
+  })
+  .run();

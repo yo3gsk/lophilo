@@ -6,6 +6,7 @@ var npm = require('npm');
 var npm2debian = require('./lib/cli.js');
 var path = require('path');
 var Q = require('qq');
+var fs = require('fs');
 
 function getPackage(name, cb) {
 	var options = {
@@ -37,7 +38,7 @@ var opts = {
 };
 
 var tree = {
-	max: 0,
+	maxdepth: 0,
   pending: 1 
 };
 
@@ -60,6 +61,9 @@ function linkAllDependencies(name) {
 }
 */
 
+function clone(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
 /*
  * Makefile
  *
@@ -68,9 +72,20 @@ function linkAllDependencies(name) {
  *    dpkg -i <package_name>.deb
  */
 function createMakefile(output, tree, dependencies, currentDepth) {
-  while(name = tree[currentDepth].pop()) {
-    pkgdir = dependencies[name].pkgdir;
+  if(!tree[currentDepth]) {
+    console.log('Error, invalid depth ' + currentDepth);
+    console.log(util.inspect(tree));
+    process.exit(1);
+  }
+  names = clone(tree[currentDepth]);
+  while(name = names.pop()) {
+    pkgdir = npm2debian.getNameToPackageDir(name);
     alldeps = dependencies[name].alldeps;
+    if(!pkgdir || !alldeps) {
+      console.log('Invalid dependency information for ' + name + ':');
+      console.log(util.inspect(dependencies[name]));
+      process.exit(1);
+    }
     output += pkgdir + '.deb: ' + (Object.keys(alldeps).length>0?Object.keys(alldeps).join('.deb, ') + '.deb\n': '\n');
     output += '\tdpkg-buildpackage -b -k37FC6E55 -d -rfakeroot ' + pkgdir + '\n';
     output += '\tdpkg -i ${@}' + '\n';
@@ -84,52 +99,64 @@ function createMakefile(output, tree, dependencies, currentDepth) {
 
 exports.createMakefile = createMakefile;
 
-function debianizeSublevel(tree, currentDepth, dependencies, debianize, lookupPkgDir) {
-  p = [];
-  while(name = tree[currentDepth].pop()) {
-    console.log('depth ' + currentDepth + ' debianizing ' + name);
-    opts.dependencies = dependencies[name].deps;
-    opts.devDependencies = dependencies[name].devdeps;
-    p.push(debianize(name, opts)).then(function() {
-      dependencies[name].pkgdir = (name);
-      return dependencies[name].pkgdir;
-    });
+function debianizeTree(inputs) {
+  console.log(arguments.callee.name); console.log(arguments);
+  var deferred = Q.defer();
+  n = deferred.promise;
+  for(var currentDepth = inputs.tree.maxdepth; 
+      currentDepth>0; 
+      currentDepth--) {
+    console.log('processing depth ' + currentDepth);
+    names = clone(inputs.tree[currentDepth]);
+    promises = [];
+    while(name = names.pop()) {
+      console.log(' debianizing ' + name);
+      opts.dependencies = inputs.dependencies[name].deps;
+      opts.devDependencies = inputs.dependencies[name].devdeps;
+      promises.push(npm2debian.debianize(name, opts).fail(function(err) {console.log(err); process.exit(1);}));
+    }
+    n = n.then(Q.all(promises));
   }
-  if(currentDepth > 0) {
-    return Q.all(p).then(debianizeSublevel(tree, currentDepth-1, dependencies, debianize, lookupPkgDir));
-  } else {
-    return Q.all(p);
-  }
-} 
-exports.debianizeSublevel = debianizeSublevel;
-
-function debianizeTree(tree) {
-  return debianizeSublevel(tree, tree.max, dependencies, npm2debian.debianize, npm2debian.getNameToPackageDir);
+  n = n.then(function() {return inputs;});
+  return n;
 }
 
 dependencies = {};
 dependedOn = {};
 
+function readTreeDependencies(target, treeFn, dependenciesFn) {
+  console.log(arguments.callee.name); console.log(arguments);
+  return Q.all([
+      Q.ncall(fs.readFile, fs, treeFn, "utf-8")
+        .then(JSON.parse),
+      Q.ncall(fs.readFile, fs, dependenciesFn, "utf-8")
+        .then(JSON.parse)
+  ]).then(function(inputs) {
+      return {'tree': inputs[0], 'dependencies': inputs[1]};
+    });
+}
+
 function getTree(desc, depth, cb) {
-  console.log('pending: ' + tree.pending);
 	//console.log(desc);
 	if(!tree[depth]) {
 		tree[depth] = [];
-		if(tree.max < depth)
-			tree.max = depth;
+		if(tree.maxdepth < depth)
+			tree.maxdepth = depth;
 	}
 	tree[depth].push(desc.name);
 
 	var ver = desc['dist-tags'].latest;
-  alldeps = desc.versions[ver].dependencies;
-  for(var k in desc.versions[ver].devDependencies) {
-    alldeps[k] = desc.versions[ver].devDependencies[k];
-  }
   dependencies[desc.name] = { 
     deps: desc.versions[ver].dependencies, 
     devdeps: desc.versions[ver].devDependencies, 
-    alldeps: alldeps 
+    alldeps: {} 
   }; 
+  for(var k in desc.versions[ver].devDependencies) {
+    dependencies[desc.name].alldeps[k] = desc.versions[ver].devDependencies[k];
+  }
+  for(var k in desc.versions[ver].dependencies) {
+    dependencies[desc.name].alldeps[k] = desc.versions[ver].dependencies[k];
+  }
 
   // check see if these deps were already seen
   for(var d in dependencies[desc.name].alldeps) {
@@ -151,46 +178,96 @@ function getTree(desc, depth, cb) {
 	}
   tree.pending--;
 	if(tree.pending == 0) {
-    cb(tree);
+    cb({'tree': tree, 'dependencies': dependencies});
 	}
 }
 
-exports.process = function(target) {
-  var deferred = Q.defer();
-  conf = {
-    'cache': path.resolve('.cache')
-  };
+function writeMakefile(inputs) {
+  console.log(arguments.callee.name); console.log(arguments);
+  makefile = createMakefile(
+      '', inputs.tree, inputs.dependencies, inputs.tree.maxdepth);
+  return Q.ncall(
+      fs.writeFile, fs, opts.output + '/Makefile', makefile);
+}
 
-  npm.load(conf, function(err) {
-    if(err) {
-      console.log('error initializing npm');
-      return;
-    }
-    console.log(target);
-    getPackage(target, function(desc) {
-      getTree(desc, 0, function(tree) {
-        debianizeTree(tree).then(function() {
-          makefile = createMakefile('', tree, dependencies, tree.maxdepth);
-          console.log(makefile);
-          fs.writeFile(opts.output + '/Makefile', makefile, function(err) {
-              if(err) {
-                console.log(err);
-              } else {
-                console.log("The file was saved!");
-              }
-          }); 
-          deferred.resolve(true);
-        }, function(error) { 
-          console.log(error);
-        });
-      });
+function getTreeDependencies(target) {
+  console.log(arguments.callee.name); console.log(arguments);
+  var deferred = Q.defer();
+  console.log('starting with ' + target);
+  getPackage(target, function(desc) {
+    getTree(desc, 0, function(inputs) {
+      deferred.resolve(inputs);
     });
   });
   return deferred.promise;
 }
 
+function writeTreeDependencies(inputs, treeFn, depsFn) {
+  console.log(arguments.callee.name); console.log(arguments);
+  return Q.all([
+    Q.ncall(fs.writeFile, fs, treeFn, JSON.stringify(inputs.tree)),
+    Q.ncall(fs.writeFile, fs, depsFn, JSON.stringify(inputs.dependencies))
+    ]).then(function() { return inputs});
+}
+
+function convertToDebian(inputs) {
+  console.log(arguments.callee.name); console.log(arguments);
+  return ;
+}
+
+function execute(target, treeFn, depsFn) {
+  console.log(arguments.callee.name); console.log(arguments);
+  return Q
+    .call(readTreeDependencies, 
+        null, target, treeFn, depsFn)
+    .then(
+        function(inputs) {return inputs; }, 
+        function(err) { 
+          console.log(err);
+          console.log('Falling back to server fetch');
+          return getTreeDependencies(target).then(
+            function(inputs) {
+              return writeTreeDependencies(inputs, treeFn, depsFn)
+            }
+            ) 
+        }
+      )
+    .then(debianizeTree)
+    .then(writeMakefile)
+    .then(function() {
+        console.log('success!!');
+      })
+    .fail(function(err) { 
+      console.log('failure handler: ' + err); 
+      process.exit(1);
+      }
+    );
+}
+
+main = function(target) {
+  console.log(arguments.callee.name); console.log(arguments);
+  conf = {
+    'cache': path.resolve('.cache')
+  };
+
+  return Q
+    .ncall(npm.load, npm, conf)
+    .then(
+      function() {
+        target = 'socket.io';
+        treeFn = opts.output + '/tree.json'; 
+        depsFn = opts.output + '/dependencies.json'; 
+        return [target, treeFn, depsFn];
+      })
+    .spread(execute)
+    .fail(function(err) {
+      console.log('could not execute ' + err);
+      }
+     )
+}
+exports.execute = execute;
 
 if (module === require.main) {
-  exports.process('socket.io');
-    http.createServer(function (req, res) {}).listen(process.env.PORT || 8080, "0.0.0.0");
+  main('socket.io');
+  http.createServer(function (req, res) {}).listen(process.env.PORT || 8080, "0.0.0.0");
 }
