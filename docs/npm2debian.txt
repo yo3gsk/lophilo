@@ -1,0 +1,142 @@
+= install error =
+
+npm http GET https://registry.npmjs.org/minimatch
+
+tls.js:767
+      this.npnProtocol = this.ssl.getNegotiatedProtocol();
+                                  ^
+TypeError: Object #<Connection> has no method 'getNegotiatedProtocol'
+    at SecurePair.maybeInitFinished (tls.js:767:35)
+    at CleartextStream._pull (tls.js:452:15)
+    at SecurePair.cycle (tls.js:737:20)
+    at EncryptedStream.write (tls.js:131:13)
+    at Socket.ondata (stream.js:38:26)
+    at Socket.emit (events.js:67:17)
+    at TCP.onread (net.js:377:14)
+Error fetching package
+
+...solved by recompiling with distributed openssl version
+
+= conversion outline =
+
+Embedded systems:
+
+-have limited disk, memory and cpu resources
+-downloading and building repeatedly npm packages out of the pool of 7000+ packages can be prohibitive
+-we want most common dependencies to be pre-installed
+-we want a single packaging system (Debian) to be used
+-we want to provide a distinct set of tested packages from a custom repository
+
+NPM is a combination of build, dependencies retrieval and installation.
+
+There's some efforts to convert to Debian such as npm2debian, but these follow the usual pattern of attaching every dependency.
+
+We want to hack the npm2debian build process to NOT stick the dependencies in the node_modules subdirectory
+and instead use symlinks to /usr/lib/node_modules. Or basically have the install process ignore dependencies 
+and assume they've been provided by the global userspace...
+
+Dependencies are instead enforced by the Depends: field of the debian package
+
+...We do not use npm install as it forces download of dependencies...
+
+Major steps:
+
+- Retrieve and sort dependencies (output is order of dependencies in build order)
+- Retrieve and debianize all dependencies for those that are not already installed locally
+- Link dependencies (npm link), build, test, package as Debian and install locally (following sorted dependencies) in order
+
+
+For package dependency tree (devDependency and Dependency),  from leafs to target root
+	debianize
+		download package in order
+		create debian/DEBIAN control files
+	move to the downloaded package directory
+	for every devDependency
+		npm link <devDependency>@<latest version that matches semver>
+	for every dependency
+		npm link <dependency>@<latest version that matches semver>
+	for arch in (i386, armel)
+		dpkg-buildpackage -aarmel -b -k37FC6E55 -d -rfakeroot
+		#... npm build (using cross-compile flags and compiler masquerade directory if necessary)
+		#... npm test
+		create ./debian/usr/lib/node_modules/<package name>
+		copy lib/, package.json, *.js, *.md into destination
+		package debian/ as debian package
+		if arch matches host (all or i386)
+			#install debian package locally with dpkg -i
+			sudo dpkg -i lophilo-npm-active-x-obfuscator_0.0.1-1_all.deb
+
+
+Example: socket.io
+
+dependencies...
+
+socket.io
+* socket.io-client
+** uglify-js
+** xmlhttprequest
+** ws (src/ directory with .cc)
+*** commander
+*** options
+** active-x-obfuscator
+*** zeparser
+
+with many more devDependencies! Total is over 75 packages depended on
+	
+TODO:
+- enable versioned package and check semver dependencies.
+
+= intermediate dependencies output file =
+
+zeparser:
+[...]
+socket.io: [direct dependencies list]
+
+= new rules file for active-x-obfuscator =
+
+#!/usr/bin/make -f
+
+NODE_PREFIX=debian/lophilo-npm-active-x-obfuscator/usr
+MODULE_DEST=$(NODE_PREFIX)/lib/node_modules/active-x-obfuscator
+
+%:
+  dh $@
+
+override_dh_auto_build:
+  npm build
+
+override_dh_auto_test:
+  npm test
+
+override_dh_auto_install:
+  mkdir -p $(MODULE_DEST)
+  cp -r lib/ *.js *.md package.json  $(MODULE_DEST)
+
+clean:
+  rm -fr $(MODULE_DEST)
+  dh clean
+
+= commander rules file =
+
+#!/usr/bin/make -f
+
+NODE_PREFIX=debian/lophilo-npm-commander/usr
+MODULE_DEST=$(NODE_PREFIX)/lib/node_modules/commander
+
+%:
+        dh $@
+
+override_dh_auto_build:
+        npm build
+
+override_dh_auto_test:
+        npm test
+
+override_dh_auto_install:
+        mkdir -p $(MODULE_DEST)
+        cp -r lib/ *.js *.md package.json  $(MODULE_DEST)
+
+
+clean:
+        dh clean
+
