@@ -1,6 +1,6 @@
 {
-  "root":{
-    "pkgdir":"rootdir",
+  "socket.io":{
+    "pkgdir":"socket.iodir",
     "alldeps":{"devdirect":true, "direct":true},
     "devdeps":{"devdirect":true},
     "deps":{"direct":true}

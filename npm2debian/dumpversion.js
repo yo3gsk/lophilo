@@ -13,7 +13,7 @@ var opts = {
 	maintainer: 'Ricky Ng-Adam',
 	email: 'rngadam@lophilo.com',
 	noPackagePrefix: false,
-	packagePrefix: 'lophilo-npm-',
+	packagePrefix: 'lpl-npm-',
 	debBuild: '1',
 	output: 'out'
 };
@@ -42,18 +42,29 @@ function getPackage(name, cb) {
 	});
 }
 
+exports.getPackage = getPackage;
+
 function clone(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
-function fakeDebianize(name, opts) {
-  return Q.call(console.log, console, 'fake debianization ' + name);
+
+function checkParams(params) {
+  if(!params.tree.maxDepth) {
+    console.log('invalid maxDepth property');
+    process.exit(1);
+  }
+  if(!params || !params.tree || !params.dependencies) {
+    console.log('invalid input to writeMakefile');
+    process.exit(1);
+  }
 }
 
 function debianizeTree(params) {
   console.log(arguments.callee.name); console.log(arguments);
   errors = [];
   promises = [];
+  checkParams(params);
   for(var currentDepth = params.tree.maxDepth; 
       currentDepth>0; 
       currentDepth--) {
@@ -66,7 +77,7 @@ function debianizeTree(params) {
       opts.dependencies = params.dependencies[name].deps;
       opts.devDependencies = params.dependencies[name].devdeps;
       // debianize returns a promise to debianize eventually...
-      promises.push(npm2debian.debianize(name, opts).fail(
+      promises.push(debianize(name, opts).fail(
               function(err) {
                 console.log(
                   'npm2debian.debianize failed: ' + err);
@@ -80,6 +91,28 @@ function debianizeTree(params) {
   return Q.allResolved(promises).then(function() {
     console.log('debianization complete');
     return params;
+  });
+}
+
+function writePkgNames(params) {
+  console.log(arguments.callee.name); console.log(arguments);
+  return Q.ncall(
+    fs.writeFile, 
+    fs, 
+    opts.output + '/pkgnames.json', 
+    JSON.stringify(params.pkgNames)).then(
+    function() {return params});
+}
+
+function readPkgNames(params) {
+  console.log(arguments.callee.name); console.log(arguments);
+  return Q.ncall(
+    fs.readFile, 
+    fs, 
+    opts.output + '/pkgnames.json', 
+    'utf-8').then(function(output) {
+      params.pkgNames = JSON.parse(output);
+      return params;
   });
 }
 
@@ -99,6 +132,10 @@ function readTreeDependencies(target, treeFn, dependenciesFn) {
 }
 
 function getTree(desc, depth, cb) {
+  if(!desc) {
+    console.log('invalid descriptor, aborting');
+    process.exit(1);
+  }
 	//console.log(desc);
 	if(!tree[depth]) {
 		tree[depth] = [];
@@ -120,21 +157,23 @@ function getTree(desc, depth, cb) {
     dependencies[desc.name].alldeps[k] = desc.versions[ver].dependencies[k];
   }
 
+  fetchQueue = [];
   // check see if these deps were already seen
-  for(var d in dependencies[desc.name].alldeps) {
-    if(dependedOn[d]) {
-      dependedOn[d].push(desc.name);
-      // we've already scheduled fetching it...
-      delete dependencies[desc.name].alldeps[d];
+  for(var dep in dependencies[desc.name].alldeps) {
+    if(dependedOn[dep]) {
+      dependedOn[dep].push(desc.name);
+      // we've already scheduled fetching it elsewhere!
     } else {
-      dependedOn[d] = [desc.name];
+      dependedOn[dep] = [desc.name];
+      fetchQueue.push(dep);
     }
   }
 
-	for(var key in dependencies[desc.name].alldeps) {
+	for(var i=0; i<fetchQueue.length; i++) {
+    //console.log('fetching ' + fetchQueue[i]);
     tree.pending++;
-		console.log(Array(depth).join('>') + key);
-		getPackage(key, function(desc) {
+		console.log(Array(depth).join('>') + fetchQueue[i]);
+		getPackage(fetchQueue[i], function(desc) {
       getTree(desc, depth+1, cb);
     }); 
 	}
@@ -145,12 +184,18 @@ function getTree(desc, depth, cb) {
 }
 
 function writeMakefile(params) {
-  if(!params || !params.tree || !params.dependencies) {
-    console.log('invalid input to writeMakefile');
-    process.exit(1);
-  }
+  console.log(arguments.callee.name); console.log(arguments);
+  checkParams(params);
   //console.log(arguments.callee.name); console.log(arguments);
   output = '';
+  suffix = '.deb';
+  if(currentDepth == 0) {
+    name = params.tree['0'][0];
+    pkgname = params.pkgNames[name].archive;
+    output += '.PHONY: all';
+    output += 'all: ' + pkgname + suffix + '\n';
+  }
+  uninstall = [];
   for(var currentDepth = params.tree.maxDepth; 
       currentDepth >= 0; 
       currentDepth--) {
@@ -164,19 +209,33 @@ function writeMakefile(params) {
       if(name === 'serve')
         continue;
       console.log('creating Makefile target ' + name);
-      pkgdir = npm2debian.getNameToPackageName(name);
-      alldeps = params.dependencies[name].alldeps;
-      if(!pkgdir || !alldeps) {
+      pkgname = params.pkgNames[name].archive;
+      pkgdir = params.pkgNames[name].dir;
+      alldeps = [];
+      for(k in params.dependencies[name].alldeps) {
+        if(k === 'serve')
+          continue;
+        console.log('pushing ' + k);
+        alldeps.push(params.pkgNames[k].archive);
+      }
+      if(!pkgname || !pkgdir || !alldeps) {
         console.log('Invalid dependency information for ' + name + ':');
         console.log(util.inspect(params.dependencies[name]));
         process.exit(1);
       }
-      output += pkgdir + '.deb: ' + (Object.keys(alldeps).length>0?Object.keys(alldeps).join('.deb, ') + '.deb\n': '\n');
-      output += '\tdpkg-buildpackage -b -k37FC6E55 -d -rfakeroot ' + pkgdir + '\n';
-      output += '\tdpkg -i ${@}' + '\n';
+      output += pkgname + suffix + ': ' + (alldeps.length>0?alldeps.join(suffix + ' ') + suffix + '\n': '\n');
+      output += '\t@echo Building package ' + name + '\n';
+      output += '\tcd ./' + pkgdir + '; dpkg-buildpackage -b -k37FC6E55 -d -rfakeroot\n';
+      output += '\tsudo dpkg -i ${@}' + '\n\n';
+      uninstall.push(pkgname);
     }
   }
-  console.log('my output: ' + output);
+
+  output += 'uninstall:\n'
+  while(pkgname = uninstall.pop()) { 
+    output += '\t-sudo dpkg -r ' + pkgname + '\n'; 
+  }
+  console.log('Makefile output: ' + output);
   return Q.ncall(
       fs.writeFile, fs, opts.output + '/Makefile', output).then(function() {
     console.log('Makefile written out!');
@@ -203,13 +262,44 @@ function writeTreeDependencies(params, treeFn, depsFn) {
     ]).then(function() { return params});
 }
 
+PARAMS = {};
+function passParams(params) {
+  for(var k in params) {
+    PARAMS[k] = params[k];
+  }
+  return PARAMS;
+}
+
+if(opts.output === "test") {
+  getNameToPackageName = function getNameToPackageName(name) {
+    return name + '-rev';
+  }
+  debianize = function(name, opts) {
+    return Q.call(console.log, console, 'fake debianization ' + name);
+  }
+} else {
+  getNameToPackageName = npm2debian.getNameToPackageName;
+  debianize = npm2debian.debianize;
+}
+
+
+function updatePkgNames(params) {
+  console.log(arguments.callee.name); console.log(arguments);
+  params.pkgNames = {};
+  console.log(util.inspect(params.dependencies));
+  for(var k in params.dependencies) {
+    params.pkgNames[k] = getNameToPackageName(k);
+  }
+  return params;
+}
+
 function execute(target, treeFn, depsFn) {
   console.log(arguments.callee.name); console.log(arguments);
   return Q
     .call(readTreeDependencies, 
         null, target, treeFn, depsFn)
     .then(
-        function(params) {return params; }, 
+        passParams, 
         function(err) { 
           console.log(err);
           console.log('Falling back to server fetch');
@@ -220,7 +310,15 @@ function execute(target, treeFn, depsFn) {
             ) 
         }
       )
-    .then(debianizeTree)
+    .then(readPkgNames)
+    .then(
+        passParams, 
+        function(err) {
+          console.log('Reading package failed: ' + err);
+          return Q.call(debianizeTree, null, PARAMS)
+            .then(updatePkgNames)
+            .then(writePkgNames)
+        })
     .then(writeMakefile)
     .then(function() {
         console.log('success!!');

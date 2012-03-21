@@ -1,6 +1,6 @@
 {
-  "maxdepth":2,
+  "maxDepth":2,
   "2":["leaf"],
   "1":["direct", "devdirect"],
-  "0":["root"]
+  "0":["socket.io"]
 }
