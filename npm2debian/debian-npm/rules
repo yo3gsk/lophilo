@@ -1,0 +1,23 @@
+#!/usr/bin/make -f
+
+NODE_PREFIX=debian/${debianName}/usr
+MODULE_DEST=$(NODE_PREFIX)/lib/node_modules/${pkg}
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	${npmlink}
+	npm build
+
+override_dh_auto_test:
+	-npm test || touch ${pkg}-test-failed
+
+override_dh_auto_install:
+	mkdir -p $(MODULE_DEST)
+	-cp -r dist/ bin/ lib/ *.js *.md package.json $(MODULE_DEST)
+	-cd $(NODE_PREFIX)/bin; find ../lib/node_modules/burrito/bin/ -type f -exec ln -s {} . \;
+	-chmod a+rx $(MODULE_DEST)/bin/*
+
+clean:
+	-dh clean

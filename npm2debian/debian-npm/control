@@ -1,0 +1,12 @@
+Source: #PACKAGE#
+Section: misc
+Priority: optional
+Maintainer: #USERNAME# <#EMAIL#>
+Build-Depends: nodejs, debhelper (>= 7.0.52), ${buildDepends}, #BUILD_DEPS#
+Standards-Version: #POLICY#
+
+Package: #PACKAGE#
+Architecture: ${arch}
+Depends: ${depends}, ${shlibs:Depends}, ${misc:Depends}, ${dependsdebs}
+Description: ${shortdesc}
+ ${longdesc}
