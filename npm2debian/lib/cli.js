@@ -181,7 +181,11 @@ makeSourcePackage = function(pkg, ver, opts) {
     ctx.debianNameVersioned = ctx.debianName + ctx.debianNameSuffix;
     ctx.devDependencies = Object.keys(opts.devDependencies).join(' ');
     ctx.dependencies = Object.keys(opts.dependencies).join(' ');
-    ctx.dependsdebs = Object.keys(opts.dependencies).join(', ');
+    dependsdebs = [];
+    for(k in opts.dependencies) {
+      dependsdebs.push(ctx.debianNamePrefix + k);
+    }
+    ctx.dependsdebs = dependsdebs.join(', ');
     if(ctx.devDependencies && ctx.dependencies) {
       ctx.npmlink = ['npm link', ctx.devDependencies, ctx.dependencies].join(' ');
     } else {
@@ -192,7 +196,11 @@ makeSourcePackage = function(pkg, ver, opts) {
     pkgName = ctx.debianName + '_' + ver + '-1_' + ctx.arch ;
     var debianPackageDir = PATH.join(opts.output, pkgDir),
         debianDir = PATH.join(debianPackageDir, 'debian');
-    nameToPackageName[pkg] = {'dir': pkgDir, 'archive': pkgName};
+    nameToPackageName[pkg] = {
+      'logical': ctx.debianName, 
+      'dir': pkgDir, 
+      'archive': pkgName};
+    console.log('recorded ' + pkg);
 
     return Q.step(
         function() {

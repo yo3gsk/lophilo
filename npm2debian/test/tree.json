@@ -1,6 +1,1 @@
-{
-  "maxDepth":2,
-  "2":["leaf"],
-  "1":["direct", "devdirect"],
-  "0":["socket.io"]
-}
+{"0":["root"],"1":["devdep","directdep"],"2":["leaf"],"maxDepth":2}
