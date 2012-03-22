@@ -185,9 +185,18 @@ function processDesc(params, desc, depth) {
     updateTree(params, desc, depth);
     queue = [];
     for(var dep in params.dependencies[desc.name].alldeps) {
-      newPromise = params.fnc.getPackage(dep, depth+1)
+      currentDepth = depth+1;
+      if(params.alreadyQueued[dep]) {
+        if(params.alreadyQueued[dep] < currentDepth) {
+          params.alreadyQueued[dep] = currentDepth;
+        }
+        continue;
+      } else {
+        params.alreadyQueued[dep] = currentDepth;
+      }
+      newPromise = params.fnc.getPackage(dep, currentDepth)
         .then(function(desc) {
-          return processDesc(params, desc, depth+1);
+          return processDesc(params, desc, currentDepth);
         });
       queue.push(newPromise);
     }
@@ -200,6 +209,7 @@ function getTreeDependenciesPromise(params) {
   };
   params.dependencies = {};
   params.dependedOn = {};
+  params.alreadyQueued = {};
   return params.fnc.getPackage(params.target)
     .then(function(desc) {
       return processDesc(params, desc, 0);
