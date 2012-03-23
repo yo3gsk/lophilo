@@ -1,31 +1,12 @@
-= install error =
-
-npm http GET https://registry.npmjs.org/minimatch
-
-tls.js:767
-      this.npnProtocol = this.ssl.getNegotiatedProtocol();
-                                  ^
-TypeError: Object #<Connection> has no method 'getNegotiatedProtocol'
-    at SecurePair.maybeInitFinished (tls.js:767:35)
-    at CleartextStream._pull (tls.js:452:15)
-    at SecurePair.cycle (tls.js:737:20)
-    at EncryptedStream.write (tls.js:131:13)
-    at Socket.ondata (stream.js:38:26)
-    at Socket.emit (events.js:67:17)
-    at TCP.onread (net.js:377:14)
-Error fetching package
-
-...solved by recompiling with distributed openssl version
-
-= conversion outline =
+= Motivation =
 
 Embedded systems:
 
--have limited disk, memory and cpu resources
--downloading and building repeatedly npm packages out of the pool of 7000+ packages can be prohibitive
--we want most common dependencies to be pre-installed
--we want a single packaging system (Debian) to be used
--we want to provide a distinct set of tested packages from a custom repository
+* have limited disk, memory and cpu resources
+* downloading and building repeatedly npm packages out of the pool of 7000+ packages can be prohibitive
+* we want most common dependencies to be pre-installed
+* we want a single packaging system (Debian) to be used
+* we want to provide a distinct set of tested packages from a custom repository
 
 NPM is a combination of build, dependencies retrieval and installation.
 
@@ -39,36 +20,7 @@ Dependencies are instead enforced by the Depends: field of the debian package
 
 ...We do not use npm install as it forces download of dependencies...
 
-Major steps:
-
-retrieve 
-- Retrieve and sort dependencies (output is order of dependencies in build order)
-- Retrieve and debianize all dependencies for those that are not already installed locally
-- Link dependencies (npm link), build, test, package as Debian and install locally (following sorted dependencies) in order
-
-
-For package dependency tree (devDependency and Dependency),  from leafs to target root
-	debianize
-		download package in order
-		create debian/DEBIAN control files
-	move to the downloaded package directory
-	for every devDependency
-		npm link <devDependency>@<latest version that matches semver>
-	for every dependency
-		npm link <dependency>@<latest version that matches semver>
-	for arch in (i386, armel)
-		dpkg-buildpackage -aarmel -b -k37FC6E55 -d -rfakeroot
-		#... npm build (using cross-compile flags and compiler masquerade directory if necessary)
-		#... npm test
-		create ./debian/usr/lib/node_modules/<package name>
-		copy lib/, package.json, *.js, *.md into destination
-		package debian/ as debian package
-		if arch matches host (all or i386)
-			#install debian package locally with dpkg -i
-			sudo dpkg -i lophilo-npm-active-x-obfuscator_0.0.1-1_all.deb
-
-
-Example: socket.io
+= Example: socket.io =
 
 dependencies...
 
@@ -82,108 +34,9 @@ socket.io
 ** active-x-obfuscator
 *** zeparser
 
-with many more devDependencies! Total is over 75 packages depended on
-	
+with many more devDependencies! Total is over 75 packages depended on...
 
-= intermediate dependencies output file =
-
-zeparser:
-[...]
-socket.io: [direct dependencies list]
-
-= new rules file for active-x-obfuscator =
-
-#!/usr/bin/make -f
-
-NODE_PREFIX=debian/lophilo-npm-active-x-obfuscator/usr
-MODULE_DEST=$(NODE_PREFIX)/lib/node_modules/active-x-obfuscator
-
-%:
-  dh $@
-
-override_dh_auto_build:
-  npm build
-
-override_dh_auto_test:
-  npm test
-
-override_dh_auto_install:
-  mkdir -p $(MODULE_DEST)
-  cp -r lib/ *.js *.md package.json  $(MODULE_DEST)
-
-clean:
-  rm -fr $(MODULE_DEST)
-  dh clean
-
-= commander rules file =
-
-#!/usr/bin/make -f
-
-NODE_PREFIX=debian/lophilo-npm-commander/usr
-MODULE_DEST=$(NODE_PREFIX)/lib/node_modules/commander
-
-%:
-        dh $@
-
-override_dh_auto_build:
-        npm build
-
-override_dh_auto_test:
-        npm test
-
-override_dh_auto_install:
-        mkdir -p $(MODULE_DEST)
-        cp -r lib/ *.js *.md package.json  $(MODULE_DEST)
-
-
-clean:
-        dh clean
-
-
-
-= improvements =
-
-TODO:
-
-* enable versioned package and check semver dependencies. 
-** multiple versions of the same package should be abled to be installed.
-* configure cross-compiling to armel
-** _all, _i386, _armel architecture need to be dynamically set
-** must use a proper directory PREFIX depending on the target platform
-* failing tests must be inventoried
-
-
-= queueing as we discover dependencies... =
-
-pending queue: waiting to be processed
-fetching queue: waiting for their descriptors to be fetch
-process queue: waiting for their dependencies to be added to pending queue
-
-while(we have unfetched elements) {
-	get a promise for each of the dependencies to fetch descriptor
-		when resolved, queue more fetching promises
-	add these promises to the queue
-}
-
-= re-design =
-
-* build a persistent graph of dependencies of interest
-** nodes are pkgname+version, edges are dependencies
-** must update based on discovery
-** must limit reads to the server
-
-* fetch packages based on graph
-** if directory exist, don't do anything
-** use a local cache
-** uncompress in a single directory
-
-* update debian/ control and rules file
-** debian build version incremen
-
-* generate universal build file (Makefile)
-** dependencies are reflected in build target dependencies
-
-= desired final system =
+= Desired final system =
 
 A http server that can be configured from /etc/apt/sources.list.d as follows:
 
@@ -211,27 +64,37 @@ server:
 * packages are downloaded, decompressed
 ** eventually, we expect these to pull in organically every major important module...
 
-= design ideas =
 
-* separate processes for getting graph, downloading and building?
-* graph database to keep updating the graph?
-* graph as a directory structure with symlinks and a separate flat hierarchy for the packages?
-** npm2debian/packages
-** npm2debian/dependencies
-** socket.io-VER/
-** if package exist, symlink PACKAGE to proper location
-** if package does not exist
-*** download archive
-*** decompress to the pool of packages
-*** apply PATCHES/
-*** symlink under the special PACKAGE name
+= Requirements =
 
-Benefits: filesystem == persistence, easy to walk, can use Unix command-line tools
+* enable versioned package and check semver dependencies. 
+** multiple versions of the same package should be abled to be installed.
 
-* Makefile: pick root directory and walks the structure following symlinks until the leaf
-** generates target: dependencies by filenames
+* build a persistent graph of dependencies of interest
+** nodes are pkgname+version, edges are dependencies
+** must update based on discovery
+** must limit reads to the server
 
-=  SEPARATE INDEPENDENT, PARALLEL PROCESSES USING THE FILESYSTEM FOR PERSISTENCE =
+* fetch packages based on graph
+** if directory exist, don't do anything
+** use a local cache
+** uncompress in a single directory
+
+* update debian/ control and rules file
+** debian build version incremen
+
+* generate universal build file (Makefile)
+** dependencies are reflected in build target dependencies
+
+=  Design =
+
+Separate, independent, possibly parallel processes using the filesystem for persistence.
+
+Benefits of using the filesystem:
+* persistence
+* easy to walk
+* can use Unix command-line tools
+
 
 Terminology:
 
@@ -270,8 +133,9 @@ Terminology:
 ** for each subdirectories in pool/[ARCH]/[SRCDIR]/
 *** if config.json:regenerate === true, regenerate debian/ directory even if it already exists
 *** if config.json:regenerate === false, continue
-*** deduce ARCH from directory and read revision out of [MODULENAMENAME-VERSION-revision]
+*** deduce ARCH from directory and read revision out of [MODULENAME-VERSION-revision]
 **** if no revision yet, set to debianize.json:revision and write to file
+**** read and convert dependencies/MODULENAME-VERSION]/dependencies/* into debian deps
 **** create pool/[SRCDIR]/debian/
 ***** apply Lophilo patches from dependencies/[MODULENAMENAME-VERSION]/PATCHES if necessary
 ** RECOVERY: debianize.json contains latest desired revision, can resume with regenerate === false
@@ -292,6 +156,8 @@ Terminology:
 *** calls dpkg-build [build, test, package, clean]
 *** installs it locally (needed to enable building future deps...)
 *** runs a simple node -e 'require($MODULENAME)';
+** uninstall target
+*** dpkg -r (independent of version and arch!)
 
 * armel build
 ** npm/ is exported through NFS and mounted on armel machine
@@ -328,7 +194,7 @@ npm/
            i386/
            armel/
 
-EXPLORE
+= TODO =
 
 * creating invalid symlink
 * walking directory tree
