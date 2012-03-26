@@ -1,0 +1,200 @@
+= Motivation =
+
+Embedded systems:
+
+* have limited disk, memory and cpu resources
+* downloading and building repeatedly npm packages out of the pool of 7000+ packages can be prohibitive
+* we want most common dependencies to be pre-installed
+* we want a single packaging system (Debian) to be used
+* we want to provide a distinct set of tested packages from a custom repository
+
+NPM is a combination of build, dependencies retrieval and installation.
+
+There's some efforts to convert to Debian such as npm2debian, but these follow the usual pattern of attaching every dependency.
+
+We want to hack the npm2debian build process to NOT stick the dependencies in the node_modules subdirectory
+and instead use symlinks to /usr/lib/node_modules. Or basically have the install process ignore dependencies 
+and assume they've been provided by the global userspace...
+
+Dependencies are instead enforced by the Depends: field of the debian package
+
+...We do not use npm install as it forces download of dependencies...
+
+= Example: socket.io =
+
+dependencies...
+
+socket.io
+* socket.io-client
+** uglify-js
+** xmlhttprequest
+** ws (src/ directory with .cc)
+*** commander
+*** options
+** active-x-obfuscator
+*** zeparser
+
+with many more devDependencies! Total is over 75 packages depended on...
+
+= Desired final system =
+
+A http server that can be configured from /etc/apt/sources.list.d as follows:
+
+deb http://cnshaqs10:3142/lophilo/npm soy main
+
+[this is on Lophilo Egg hardware.  Software versions are:
+
+century: stable, tea: unstable, soy: development]
+
+client: 
+
+* apt-get install npm-socket.io
+* request goes to server to resolve latest version
+** recursively reads off the dependencies
+* fetches package (specific version if necessary)
+* install into /usr/lib/node_modules
+
+server: 
+
+* package list generation is handled by reprepo
+* packages debian control and rules are generated on-demand based on a few selected module
+** cloud9
+** socket.io
+** express
+* packages are downloaded, decompressed
+** eventually, we expect these to pull in organically every major important module...
+
+
+= Requirements =
+
+* enable versioned package and check semver dependencies. 
+** multiple versions of the same package should be abled to be installed.
+
+* build a persistent graph of dependencies of interest
+** nodes are pkgname+version, edges are dependencies
+** must update based on discovery
+** must limit reads to the server
+
+* fetch packages based on graph
+** if directory exist, don't do anything
+** use a local cache
+** uncompress in a single directory
+
+* update debian/ control and rules file
+** debian build version incremen
+
+* generate universal build file (Makefile)
+** dependencies are reflected in build target dependencies
+
+=  Design =
+
+Separate, independent, possibly parallel processes using the filesystem for persistence.
+
+Benefits of using the filesystem:
+* persistence
+* easy to walk
+* can use Unix command-line tools
+
+
+Terminology:
+
+* MODULENAME: the node module name used by require (example: socket.io)
+* MODULENAME-VERSION: the node module name and its version in node format (example: socket.io-0.9.2)
+* SRCPKG: the tar.gz file name containing the buildable source (example: socket.io_0.9.2.orig.tar.gz)
+* SRCDIR: the directory into which the srcpkg has been decompressed (example: npm-socket.io-0.9.2/)
+* DEBPACKAGE: debian full package name with version and arch information (npm-socket.io_0.9.2-1_all.deb) - note how the dash becomes an underscore!
+* DEBLOGICAL: logical name for `apt-get install` and dpkg -i (npm-socket.io)
+* ARCH: target architecture for package. all is platform indepedent (js only), armel and i386 are specific
+* REVISION: the DEBPACKAGE version (mostly due to rebuild)
+* dependencies: dependencies as listed in module descriptor
+
+* Node.js development environment
+** environment is setup with all the necessary devDependencies
+** devDependencies are not generated as they are not installed on the target system
+
+* tree.js npm/ cloud9; tree.js npm/ socket.io, ...
+** Updates the directory structure in npm/dependencies based on MODULENAMENAME-VERSION for selected roots
+** if directory does not exist OR does not have registry.json
+*** fetch module descriptor into registry.json
+*** for each dependency
+**** add a new directory, symlink and queue for fetching
+** RECOVERY: keep a copy of the JSON information for each package inside the package directory (in case of the need to recover from failure)
+
+* download.js npm/
+** walks the tree
+*** find out of date directory (ex: no/invalid SRCPKG, devDependencies/, dependencies symlink)
+**** download and decompress source package.tgz into npm/pool
+***** look at the source package and determine target arch [all|i386|armel]
+****** mv/cp source package to proper directory subdirectory based on arch
+** RECOVERY: using local npm cache of packages to prevent refetching
+
+* debianize.js npm/
+** read, bump up debianize.json:revision by one, write
+** for each subdirectories in pool/[ARCH]/[SRCDIR]/
+*** if config.json:regenerate === true, regenerate debian/ directory even if it already exists
+*** if config.json:regenerate === false, continue
+*** deduce ARCH from directory and read revision out of [MODULENAME-VERSION-revision]
+**** if no revision yet, set to debianize.json:revision and write to file
+**** read and convert dependencies/MODULENAME-VERSION]/dependencies/* into debian deps
+**** create pool/[SRCDIR]/debian/
+***** apply Lophilo patches from dependencies/[MODULENAMENAME-VERSION]/PATCHES if necessary
+** RECOVERY: debianize.json contains latest desired revision, can resume with regenerate === false
+
+* makefile.js npm/
+** for each npm/dependencies directory
+*** add target to npm/Makefile structure and debianize.json:revision
+** dependencies by filenames in the directory structure
+** check for specific arch target for each to determine output arch and read revision
+** RECOVERY: all the source information is in the directory structure
+
+* make (using npm/Makefile)
+** three main .PHONY target
+*** i386: *_i386 + multiarch
+*** armel: *_armel + multiarch
+*** multiarch: every _all
+** for each, from leaf to root (abort on fail) for every target that does not exist yet
+*** calls dpkg-build [build, test, package, clean]
+*** installs it locally (needed to enable building future deps...)
+*** runs a simple node -e 'require($MODULENAME)';
+** uninstall target
+*** dpkg -r (independent of version and arch!)
+
+* armel build
+** npm/ is exported through NFS and mounted on armel machine
+** ssh -c make of target armel on remote machine
+
+lib.js: common utility functions
+
+npm/
+    debianize.json [contains revision: 1]
+    config.json
+    dependencies/ [tree.js]
+                 socket.io-0.9.2/                         
+                                 SRCDIR -> ../../all/socket.io-0.9.2
+                                 SRCPKG -> ../../socket.io-0.9.2.tgz                                
+                                 registry.json
+                                 devDependencies/
+                                                 every devDependencies ../../MODULENAME-VERSION symlink
+                                 dependencies/                 
+                                              every dependencies ../../MODULENAME-VERSION symlink
+    pool/ [download.js]
+         all/
+             socket.io-0.9.2-revision [debianize.js:content==revision]
+             socket.io-0.9.2/
+                             package.json
+                             debian/ [debianize.js]
+                                    control
+                                    rules
+         i386/
+         armel/
+    Makefile [makefile.js]
+    debian/ [make]
+           all/
+               npm-socket.io_0.9.2-1_all.deb
+           i386/
+           armel/
+
+= TODO =
+
+* creating invalid symlink
+* walking directory tree

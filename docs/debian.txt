@@ -14,11 +14,17 @@ sub   2048R/A84DD3F8 2012-03-13
 
 = client =
 
+Debian:
+
 wget -O - http://cnshaqs10:3142/lophilo/apt/debian/conf/lophilo-debrepo.gpg.key|apt-key add -
+echo "deb http://cnshaqs10:3142/lophilo/apt/debian squeeze main" > /etc/apt/sources.list.d/lophilo.list
+
+Ubuntu:
+wget -O - http://cnshaqs10:3142/lophilo/apt/ubuntu/conf/lophilo-debrepo.gpg.key|apt-key add -
+echo "deb http://cnshaqs10:3142/lophilo/apt/ubuntu oneiric main" > /etc/apt/sources.list.d/lophilo.list
 
 in /etc/apt/sources.list.d/lophilo.list
 
-deb http://cnshaqs10:3142/lophilo/apt/debian squeeze main
 
 apt-get update 
 apt-get install lophilo-nodejs

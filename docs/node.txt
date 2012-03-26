@@ -210,3 +210,16 @@ Program received signal SIGILL, Illegal instruction.
 #4  0x000474f8 in _start ()
 (gdb)
 
+= Could not get uid/gid execvp(): No such file or directory =
+
+pm ERR! Could not get uid/gid execvp(): No such file or directory
+npm ERR!
+
+npm ERR! Error: `/home/rngadam/lophilo/npm2debian-aufs/npm-mime-1.2.5/node "/home/rngadam/lophilo-bin/lib/node_modules/npm/bin/npm-get
+-uid-gid.js" "nobody" 0` failed with 127
+npm ERR!     at ChildProcess.<anonymous> (/home/rngadam/lophilo-bin/lib/node_modules/npm/lib/utils/exec.js:49:20)
+npm ERR!     at ChildProcess.emit (events.js:70:17)
+npm ERR!     at maybeExit (child_process.js:381:16)
+npm ERR!     at Socket.<anonymous> (child_process.js:486:7)
+
+

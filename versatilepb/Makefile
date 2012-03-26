@@ -3,7 +3,7 @@ export VERSION:=$(shell make -s -C ${SOURCE} kernelversion)
 export IMAGE=${HOME}/lophilo-bin/linux/versatilepb/zImage.arm.latest
 export ARM_TEST=${HOME}/upstream/arm-test
 export INITRD=${ARM_TEST}/arm_root.img
-export QEMU=${HOME}/lophilo-bin/bin/qemu-system-arm
+export QEMU=/usr/bin/qemu-system-arm
 export DISK_NAME=squeeze1.home.qcow2
 export QEMU_PARAMETERS:=-M versatilepb -nographic -s -no-reboot
 export QEMU_LINUX:=-kernel ${IMAGE} -append "console=ttyAMA0 ip=dhcp root=/dev/nfs nfsroot=10.236.10.94:/exports/armel-squeeze rw"

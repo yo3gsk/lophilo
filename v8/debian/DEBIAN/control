@@ -1,9 +1,10 @@
-Package: lophilo-v8
-Version: 3.9.7-1
+Package: lophilo-libv8
+Version: 3.9.7-3
 Section: base
 Priority: optional
-Architecture: armel
+Architecture: i386
 Depends: libc6
+Conflicts: libv8
 Maintainer: Ricky Ng-Adam (rngadam@lophilo.com)
-Description: v8 browser
+Description: v8 library
   Executes Javascript!

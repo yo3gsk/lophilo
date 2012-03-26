@@ -5,9 +5,8 @@ NODE_VERSION:=0.7.6
 ifeq ($(LOPHILO_TARGET_ARCH),arm)
 	DEBPKG_NAME:=lophilo-nodejs_${NODE_VERSION}_armel.deb
 else
-	DEBPKG_NAME:=lophilo-nodejs_${NODE_VERSION}_i686.deb
+	DEBPKG_NAME:=lophilo-nodejs_${NODE_VERSION}_i386.deb
 endif
-
 
 DEBPKG_PREFIX:=./debian/usr 
 
@@ -55,25 +54,22 @@ sanity:
 	ssh rngadam@squeeze1 "/home/rngadam/node -e 'console.log(process.versions)'"
 
 debpkg:
-	# don't use the ARM node to install, but the natively build one...
+	# use the natively build node to install...
 	rm -fr ${DEBPKG_PREFIX}
 	mkdir -p ${DEBPKG_PREFIX}
 	node tools/installer.js ./config.gypi install
-	# this is symlinked to /usr/bin/npm...
-	chmod a+x debian/usr/lib/node_modules/npm/cli.js
+	# this is symlinked as /usr/bin/npm...
+	chmod a+x debian/usr/lib/node_modules/npm/bin/npm-cli.js
 	# delete extraneous documentation
 	rm -fr debian/usr/lib/node_modules/npm/html
 	rm -fr debian/usr/lib/node_modules/npm/doc
 	rm -fr debian/usr/lib/node_modules/npm/man
+	# actually build package
 	fakeroot dpkg-deb --build debian ${DEBPKG_NAME} 
-	# set the repo with http://wiki.debian.org/SettingUpSignedAptRepositoryWithReprepro
-	dpkg-sig -k 37FC6E55 --sign builder ${DEBPKG_NAME}
-	sudo reprepro --basedir /var/www/repos/apt/debian includedeb squeeze ${DEBPKG_NAME}
+	dpkg-sig -k ${GPG_KEY} --sign builder ${DEBPKG_NAME}
+	sudo reprepro --basedir /var/www/repos/apt/${DEB_REPO} includedeb ${DEB_CODENAME} ${DEBPKG_NAME}
 	rm -f ${DEBPKG_NAME}
 	
-zlib:
-	(cd ${HOME}/upstream/zlib;./configure --prefix ${ZLIB_INSTALL}; make;make install)
-
 local_install:
 	make install
 

@@ -1,8 +1,9 @@
 # ccache configuration; comment out to disable
 export CCACHE_TEMPDIR=/tmp
-export CCACHE_CROSS_COMPILE=distcc
+export CCACHE_PREFIX=distcc
 export CCACHE_DIR=/gdata/ccachevol
 export CCACHE_SLOPPINESS="time_macros file_macro include_file_mtime"
+export HOME=/home/rngadam
 
 if [ -z "$CCACHE_DIR" ]; then
 	export CXX="${CROSS_COMPILE}g++"

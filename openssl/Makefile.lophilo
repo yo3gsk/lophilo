@@ -1,9 +1,15 @@
-export PATH:=${HOME}/lophilo/codesourcery:${PATH}
+include ../Makefile.common
 
-.PHONY: configure build
+ifeq ($(LOPHILO_TARGET_ARCH),arm)
+	CONFIGURE_TARGET:=linux-armv4
+else
+	CONFIGURE_TARGET:=linux-elf
+endif
 
-configure:
-	./Configure linux-armv4
+.PHONY: config build
+
+config:
+	./Configure ${CONFIGURE_TARGET}
 
 build:
-	make -j`getconf _NPROCESSORS_ONLN`
+	make -j8

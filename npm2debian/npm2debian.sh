@@ -19,9 +19,9 @@ if [ -z "$EXIST" ]; then
 fi
 EXIST=`ls ${DEB_GLOB}.deb`
 if [ -z "$EXIST" ]; then 
-	# dpkg-buildpackage -d to ignore dependencies...
 	pushd .
 	cd ${DEB_GLOB}/
+	# dpkg-buildpackage -d to ignore dependencies...
 	dpkg-buildpackage -aarmel -b -k37FC6E55 -d -rfakeroot
 	if [ ! "$?" -eq 0 ]; then
 		echo "Error dpkg-buildpackage"

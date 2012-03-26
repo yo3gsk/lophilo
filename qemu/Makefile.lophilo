@@ -1,21 +1,35 @@
-export TMPDIR := /tmp
-export PATH := ${HOME}/lophilo/masquerade:${PATH}
+include ../Makefile.common
 
-.PHONY: qemu-arm clean install compiler clear-cache
+.PHONY: qemu-arm clean install clear-cache
 
-compiler:
+DEB_PREFIX:=$(shell realpath `pwd`/debian/usr)
+DEBPKG_NAME:=lophilo-qemu_1.0.1_i386.deb
+
+all:
+	@echo "DEB_PREFIX: ${DEB_PREFIX}"
 	@echo ${PATH}
 	which cc
 	
-qemu-arm:
-	./configure --target-list=arm-softmmu --enable-trace-backend=simple --prefix=${HOME}/lophilo-bin
-	time make -j4
+config:
+	./configure --target-list=arm-softmmu,arm-linux-user --prefix=${DEB_PREFIX}
+
+build:
+	time make -j8
 
 install:
+	mkdir -p ${DEB_PREFIX}/bin
 	make install
+	#cp ./arm-softmmu/qemu-system-arm ${DEB_PREFIX}/bin
+	#cp ./arm-linux-user/qemu-arm ${DEB_PREFIX}/bin
 
 clean:
 	make clean
 
 clear-cache:
 	ccache-clear
+
+debpkg:
+	fakeroot dpkg-deb --build debian ${DEBPKG_NAME} 
+	dpkg-sig -k ${GPG_KEY} --sign builder ${DEBPKG_NAME}
+	sudo reprepro --basedir /var/www/repos/apt/${DEB_REPO} includedeb ${DEB_CODENAME} ${DEBPKG_NAME}
+	rm -f ${DEBPKG_NAME}

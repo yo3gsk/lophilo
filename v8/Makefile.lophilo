@@ -1,15 +1,26 @@
-DEBPKG_NAME:=lophilo-v8_3.9.7_armel.deb
+include ../Makefile.common
+
 DEBPKG_PREFIX:=./debian/usr/lib 
-OBJDUMP:=${HOME}/lophilo/codesourcery/objdump
-ARM_TOOLCHAIN_PATH:=${HOME}/lophilo/codesourcery/arm926ej-s
 
 # https://code.google.com/p/v8/wiki/CrossCompilingForARM
 V8DIR=.
 export CXXFLAGS+=-Wno-unused-but-set-variable -Wno-unknown-warning 
+ifeq ($(LOPHILO_TARGET_ARCH), arm)
+	DEBPKG_NAME:=lophilo-libv8_3.9.7_armel.deb
+	SCONS_PARAMS:=vfp3=off armeabi=soft  arch=arm
+	SCONS_SNAPSHOT:=nobuild
+	BUILD_DEPS:=${V8DIR}/src/snapshot.cc
+else
+	DEBPKG_NAME:=lophilo-libv8_3.9.7_i386.deb
+	SCONS_PARAMS:=
+	SCONS_SNAPSHOT:=on
+endif
 
 .PHONY: build clean debpkg test
 
 all:
+	@echo ${PATH}
+	which cc
 	@echo "valid targets: build clean debpkg test"
 
 # the compile is two steps: 
@@ -20,12 +31,14 @@ all:
 # vfp3 off is how v8 figures out it's not arm7...
 ${V8DIR}/src/snapshot.cc:
 	@echo "proceeding with snapshot (step 1, host build)"
-	scons -Y${V8DIR} wordsize=32 vfp3=off armeabi=soft simulator=arm snapshot=on
+	scons -Y${V8DIR} wordsize=32 ${SCONS_PARAMS} simulator=arm snapshot=on
 	mv obj/release/snapshot.cc ${V8DIR}/src/snapshot.cc
 
-build: ${V8DIR}/src/snapshot.cc
+build: ${BUILD_DEPS}
 	@echo "proceeding with build (step 2, arm build)"
-	time scons -j8 wordsize=32 vfp3=off armeabi=soft snapshot=nobuild arch=arm sample=shell env=PATH:${ARM_TOOLCHAIN_PATH}:${PATH} library=shared 
+	time scons -j8 wordsize=32 ${SCONS_PARAMS} snapshot=${SCONS_SNAPSHOT} env=PATH:${PATH} library=shared 
+
+sanity:
 	cp libv8.so /exports/squeeze/home/rngadam
 
 debpkg:
@@ -33,8 +46,8 @@ debpkg:
 	mkdir -p ${DEBPKG_PREFIX}
 	cp libv8.so ${DEBPKG_PREFIX}
 	fakeroot dpkg-deb --build debian ${DEBPKG_NAME} 
-	dpkg-sig -k 37FC6E55 --sign builder ${DEBPKG_NAME}
-	sudo reprepro --basedir /var/www/repos/apt/debian includedeb squeeze ${DEBPKG_NAME}
+	dpkg-sig -k ${GPG_KEY} --sign builder ${DEBPKG_NAME}
+	sudo reprepro --basedir /var/www/repos/apt/${DEB_REPO} includedeb ${DEB_CODENAME} ${DEBPKG_NAME}
 	rm -f ${DEBPKG_NAME}
 
 clean:
