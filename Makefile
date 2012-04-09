@@ -12,7 +12,7 @@ compilation: /usr/bin/ccache /usr/bin/distcc
 	sudo apt-get install ccache distcc distcc-pump
 
 kernel-dev: /usr/lib/libncurses.a
-	sudo apt-get install libncurses5-dev kernel-package
+	sudo apt-get install libncurses5-dev kernel-package uboot-mkimage
 
 debpkg: /usr/bin/dpkg-buildpackage
 	sudo apt-get install devscripts dh-make debhelper fakeroot dpkg-dev
