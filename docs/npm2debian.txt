@@ -1,3 +1,7 @@
+= project n2d =
+
+...a successor to npm2debian...
+
 = Motivation =
 
 Embedded systems:
@@ -81,20 +85,26 @@ server:
 ** uncompress in a single directory
 
 * update debian/ control and rules file
-** debian build version incremen
+** debian build version increment
 
 * generate universal build file (Makefile)
 ** dependencies are reflected in build target dependencies
 
-=  Design =
+= Key approach =
 
 Separate, independent, possibly parallel processes using the filesystem for persistence.
 
+Filesystem instead of database
+
 Benefits of using the filesystem:
+* fast
 * persistence
 * easy to walk
 * can use Unix command-line tools
 
+we don't care about multiusers, replication, etc...
+
+=  Design =
 
 Terminology:
 
@@ -106,7 +116,8 @@ Terminology:
 * DEBLOGICAL: logical name for `apt-get install` and dpkg -i (npm-socket.io)
 * ARCH: target architecture for package. all is platform indepedent (js only), armel and i386 are specific
 * REVISION: the DEBPACKAGE version (mostly due to rebuild)
-* dependencies: dependencies as listed in module descriptor
+* dependencies: dependencies are modules that are required to run this module
+* dependents: dependents are modules that have dependencies on this module
 
 * Node.js development environment
 ** environment is setup with all the necessary devDependencies
@@ -117,7 +128,7 @@ Terminology:
 ** if directory does not exist OR does not have registry.json
 *** fetch module descriptor into registry.json
 *** for each dependency
-**** add a new directory, symlink and queue for fetching
+**** add a new directory, symlink as dependencies and symlink self as dependent and queue for fetching
 ** RECOVERY: keep a copy of the JSON information for each package inside the package directory (in case of the need to recover from failure)
 
 * download.js npm/
@@ -141,13 +152,13 @@ Terminology:
 ** RECOVERY: debianize.json contains latest desired revision, can resume with regenerate === false
 
 * makefile.js npm/
-** for each npm/dependencies directory
+** for each npm/dependencies directory, starting with those that have no dependents
 *** add target to npm/Makefile structure and debianize.json:revision
 ** dependencies by filenames in the directory structure
 ** check for specific arch target for each to determine output arch and read revision
 ** RECOVERY: all the source information is in the directory structure
 
-* make (using npm/Makefile)
+* make (using npm/Makefile generated in previous step)
 ** three main .PHONY target
 *** i386: *_i386 + multiarch
 *** armel: *_armel + multiarch
@@ -158,6 +169,8 @@ Terminology:
 *** runs a simple node -e 'require($MODULENAME)';
 ** uninstall target
 *** dpkg -r (independent of version and arch!)
+** repository
+*** reprepro commands for files that haven't been included yet in /var/www/repos/npm repository
 
 * armel build
 ** npm/ is exported through NFS and mounted on armel machine
@@ -165,14 +178,19 @@ Terminology:
 
 lib.js: common utility functions
 
+= Example output =
+
 npm/
     debianize.json [contains revision: 1]
     config.json
+    registry/ [tree.js]
+             socket.io.json
     dependencies/ [tree.js]
                  socket.io-0.9.2/                         
                                  SRCDIR -> ../../all/socket.io-0.9.2
-                                 SRCPKG -> ../../socket.io-0.9.2.tgz                                
-                                 registry.json
+                                 SRCPKG -> ../../socket.io-0.9.2.tgz 
+                                 all -> ../../debian/npm-socket.io_0.9.2-1_all.deb                                                               
+                                 dependents/
                                  devDependencies/
                                                  every devDependencies ../../MODULENAME-VERSION symlink
                                  dependencies/                 
@@ -195,6 +213,8 @@ npm/
            armel/
 
 = TODO =
+
+
 
 * creating invalid symlink
 * walking directory tree
