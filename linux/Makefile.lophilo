@@ -44,9 +44,6 @@ modules_prepare:
 	sudo chown rngadam:rngadam ${BUILD_DIR}
 	cp -fr --copy-contents --dereference * ${BUILD_DIR}
 
-install-debian:
-	apt-get install kernel-package
-
 debian:
 	#make deb-pkg
 	#dpkg-buildpackage -b -aarmel

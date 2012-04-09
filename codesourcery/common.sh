@@ -8,11 +8,11 @@ export HOME=/home/rngadam
 if [ -z "$CCACHE_DIR" ]; then
 	export CXX="${CROSS_COMPILE}g++"
 	export CC="${CROSS_COMPILE}gcc"
-	echo "# CS compiler, $LOPHILO_TARGET_ARCH, !ccache, !distcc"
+	#echo "# CS compiler, $LOPHILO_TARGET_ARCH, !ccache, !distcc"
 else
 	export CXX="ccache ${CROSS_COMPILE}g++"
 	export CC="ccache ${CROSS_COMPILE}gcc"
-	echo "# CS compiler, $LOPHILO_TARGET_ARCH, ccache, distcc"
+	#echo "# CS compiler, $LOPHILO_TARGET_ARCH, ccache, distcc"
 fi
 
 # compile flags for target
@@ -27,3 +27,10 @@ export AR=${CROSS_COMPILE}ar
 export RANLIB=${CROSS_COMPILE}ranlib
 export AS=${CROSS_COMPILE}as
 export OBJDUMP=${CROSS_COMPILE}objdump
+export NM=${CROSS_COMPILE}nm
+export OBJCOPY=${CROSS_COMPILE}objcopy
+export ADDR2LINE=${CROSS_COMPILE}addr2line
+export CPPFILT=${CROSS_COMPILE}c++filt
+export SPRITE=${CROSS_COMPILE}sprite
+export STRINGS=${CROSS_COMPILE}strings
+export SIZE=${CROSS_COMPILE}size
