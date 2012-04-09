@@ -6,18 +6,33 @@ LOPHILO_DIR=.
 all: 
 	@echo "mount disks with `make aufs`"
 
-setup: compilation kernel-dev debpkg node
+setup: /usr/bin/openvpn /usr/bin/screen /usr/bin/ccache /usr/bin/distcc /usr/lib/libncurses.a /usr/bin/dpkg-buildpackage /usr/bin/python /usr/bin/brctl
 
-compilation: /usr/bin/ccache /usr/bin/distcc
-	sudo apt-get install ccache distcc distcc-pump
+/usr/bin/brctl:
+	sudo apt-get install bridge-utils
 
-kernel-dev: /usr/lib/libncurses.a
+/usr/bin/openvpn:
+	sudo apt-get install openvpn
+
+/usr/bin/screen:
+	sudo apt-get install screen dvtm vim nfs-server nfs-client git openssh-server etckeeper smartmontools
+
+/usr/lib/libncurses.a: 
+	sudo apt-get install zlib1g-dev libsdl-dev glib2.0-dev binutils-gold
+
+/usr/bin/ccache:
+	sudo apt-get install ccache
+       
+/usr/bin/distcc:
+	sudo apt-get install distcc distcc-pump
+
+/usr/bin/mkimage:
 	sudo apt-get install libncurses5-dev kernel-package uboot-mkimage
 
-debpkg: /usr/bin/dpkg-buildpackage
+/usr/bin/dpkg-buildpackage:
 	sudo apt-get install devscripts dh-make debhelper fakeroot dpkg-dev
 
-node: /usr/bin/python
+/usr/bin/python:
 	sudo apt-get install python
 
 /gdata/ccachevol:
