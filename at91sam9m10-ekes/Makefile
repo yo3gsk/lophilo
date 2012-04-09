@@ -12,7 +12,11 @@ export QEMU_LINUX:=-kernel ${IMAGE} -append "console=ttyAMA0 ip=dhcp root=/dev/n
 export QEMU_NET:=-net nic,macaddr=72:e3:fe:c1:ce:21 -net tap,ifname=tap0
 export QEMU_DISK:=-drive file=${DISK_NAME},cache=none,if=sd 
 
-.PHONY: arm-test stage2 squeeze createdisk genmac
+.PHONY: arm-test stage2 squeeze createdisk genmac setup
+
+setup:
+	sudo openvpn --dev tap0 --mktun
+	sudo brctl addbr br0
 
 arm-test:
 	sudo ${QEMU} ${QEMU_PARAMETERS} ${QEMU_LINUX} ${QEMU_NET}
