@@ -14,7 +14,11 @@ SECTIONS
 	}
 
 	/* collect all initialized .data sections */
-	.data : AT ( ADDR (.text) + SIZEOF (.text) ) { 
+	. = ALIGN(4);
+		.dummy : {
+			_edummy = .;
+		}
+	.data : AT ( LOADADDR(.dummy) ) { 
 		_sdata = .;
 		*(.vectors)
 		*(.data)
