@@ -16,7 +16,7 @@ all:
 	
 config:
 	mkdir -p ./debian/usr
-	./configure --target-list=arm-softmmu,arm-linux-user --prefix=${DEB_PREFIX} --cross-prefix=${TOOLCHAIN_PATH}/
+	./configure --target-list=arm-softmmu,arm-linux-user --prefix=${DEB_PREFIX} --cross-prefix=${TOOLCHAIN_PATH}/ --enable-debug 
 
 build:
 	time make -j8
