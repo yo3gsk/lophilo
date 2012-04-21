@@ -14,4 +14,5 @@ else
 	DEB_CODENAME:=oneiric
 endif
 
-export PATH:=${TOOLCHAIN_PATH}:${PATH}
+# add this to default to this compiler
+#export PATH:=${TOOLCHAIN_PATH}:${PATH}

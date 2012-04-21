@@ -6,9 +6,6 @@ export DEBFULLNAME:="Ricky Ng-Adam"
 
 .PHONY: deps install socket.io
 
-deps:
-	sudo apt-get install devscripts dh-make debhelper fakeroot dpkg-dev
-
 install:
 	# version 0.3.x not in repo...
 	git clone https://github.com/veged/coa.git node_modules/coa

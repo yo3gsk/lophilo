@@ -1,10 +1,47 @@
 UPSTREAM=${HOME}/upstream
 LOPHILO_DIR=.
 
-.PHONY: qemu linux all nodejs upstream openssl v8 npm2debian zlib build-couchdb
+.PHONY: qemu linux all nodejs upstream openssl v8 npm2debian zlib build-couchdb linux-sam9m10 setup
 
 all: 
 	@echo "mount disks with `make aufs`"
+
+setup: /usr/bin/openvpn /usr/bin/screen /usr/bin/ccache /usr/bin/distcc /usr/lib/libncurses.a /usr/bin/dpkg-buildpackage /usr/bin/python /usr/bin/brctl
+
+/usr/bin/brctl:
+	sudo apt-get install bridge-utils
+
+/usr/bin/openvpn:
+	sudo apt-get install openvpn
+
+/usr/bin/screen:
+	sudo apt-get install screen dvtm vim nfs-server nfs-client git openssh-server etckeeper smartmontools
+
+/usr/lib/libncurses.a: 
+	sudo apt-get install zlib1g-dev libsdl-dev glib2.0-dev binutils-gold
+
+/usr/bin/ccache:
+	sudo apt-get install ccache
+       
+/usr/bin/distcc:
+	sudo apt-get install distcc distcc-pump
+
+/usr/bin/mkimage:
+	sudo apt-get install libncurses5-dev kernel-package uboot-mkimage
+
+/usr/bin/dpkg-buildpackage:
+	sudo apt-get install devscripts dh-make debhelper fakeroot dpkg-dev
+
+/usr/bin/python:
+	sudo apt-get install python
+
+/gdata/ccachevol:
+	sudo mkdir -p $@
+	sudo chown -R ${USER}:${USER} $@
+
+codesourcery: /opt/codesourcery/arm-2011.09/bin/arm-none-linux-gnueabi-gcc
+	# from our custom Lophilo repository...
+	sudo apt-get install codesourcery-arm
 
 aufs: linux nodejs openssl v8 npm2debian zlib qemu build-couchdb
 
@@ -43,6 +80,11 @@ npm2debian:
 	sudo mount -t aufs -o br=${LOPHILO_DIR}/$@:${UPSTREAM}/$@ none ${LOPHILO_DIR}/$@-aufs
 
 zlib:
+	mkdir -p ${LOPHILO_DIR}/$@
+	mkdir -p ${LOPHILO_DIR}/$@-aufs
+	sudo mount -t aufs -o br=${LOPHILO_DIR}/$@:${UPSTREAM}/$@ none ${LOPHILO_DIR}/$@-aufs
+
+linux-sam9m10:
 	mkdir -p ${LOPHILO_DIR}/$@
 	mkdir -p ${LOPHILO_DIR}/$@-aufs
 	sudo mount -t aufs -o br=${LOPHILO_DIR}/$@:${UPSTREAM}/$@ none ${LOPHILO_DIR}/$@-aufs

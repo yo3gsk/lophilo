@@ -26,9 +26,6 @@ all:
 	@echo "PATH: ${PATH}"
 	which cc
 	@echo "choose deps or node"
-deps:
-	@echo "installing packages"
-	sudo apt-get install python
 
 config:
 	@echo "configuring and making node"

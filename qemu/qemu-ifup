@@ -1,0 +1,9 @@
+#!/bin/sh
+if [ -z "$1" ]; then
+	echo "$0 <interface name>"
+	exit 1
+fi
+/usr/sbin/openvpn --mktun --dev $1 --user `id -un`
+/sbin/ifconfig $1 0.0.0.0 promisc up
+ip addr flush dev $1
+/sbin/brctl addif br0 $1

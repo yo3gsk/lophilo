@@ -1,1 +1,5 @@
-exec make -f Makefile.lophilo "$@"
+if [ -f Makefile.lophilo ]; then
+	exec make -f Makefile.lophilo "$@"
+else
+	exec make "$@"
+fi
