@@ -34,3 +34,4 @@ export CPPFILT=${CROSS_COMPILE}c++filt
 export SPRITE=${CROSS_COMPILE}sprite
 export STRINGS=${CROSS_COMPILE}strings
 export SIZE=${CROSS_COMPILE}size
+export GDB=${CROSS_COMPILE}gdb
