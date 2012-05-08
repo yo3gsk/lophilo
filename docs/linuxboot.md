@@ -1,20 +1,20 @@
-= Linux booting Linux =
+# Linux booting Linux
 
-== Goal ==
+## Goal
 
 Use a minimal Linux kernel with minimal functionality executing directly from the SPI flash to:
 
 * Check the MicroSD card partitioning and file system
-** If empty MicroSD card
-*** Configure network stack (DHCP) and fetch using HTTP
-*** Download FPGA and kernel image from Lophilo.com
-*** Partition into FAT32 (32MB) and EXT4 (whatever is left)
+	* If empty MicroSD card
+		* Configure network stack (DHCP) and fetch using HTTP
+		* Download FPGA and kernel image from Lophilo.com
+		* Partition into FAT32 (32MB) and EXT4 (whatever is left)
 * In parallel
-** load FPGA image from FAT32 into FPGA
-** load from MicroSD card FAT32 partiion
+	* load FPGA image from FAT32 into FPGA
+	* load from MicroSD card FAT32 partiion
 * kexec MicroSD card kernel
 
-== Benefits ==
+## Benefits 
 
 * Single set of drivers between the boot firmware and the kernel
 * Switch to single compiler (GNU GCC) instead of having to port from Keil down the line
@@ -25,46 +25,47 @@ Use a minimal Linux kernel with minimal functionality executing directly from th
 * Take advantage of relatively powerful CPU (4MB Flash storage, 128MB SDRAM)
 * Best and fastest TCP/IP stack (decades ahead of uIP or lwip)
 
-== Requirements ==
+## Requirements 
 
 * Fast
-** <1s kernel startup up to our usercode
-** <1s network initialization (DHCP)
-** <1s load image into memory 
+	* <1s kernel startup up to our usercode
+	* <1s network initialization (DHCP)
+	* <1s load image into memory 
 * Minimal memory usage
 * Fastest network initialization possible
 * No operating system image or userspace applications (single custom "init")
 
-== Functionality required ==
+## Functionality required
 
 * Block device and filesystem support
-** FAT32 support
-** EXT4 support
-** MicroSD device card support
-** partitioning support fat32/ext4
+	* FAT32 support
+	* EXT4 support
+	* MicroSD device card support
+	* partitioning support fat32/ext4
 * TCP/IP
-** DHCP kernel level autoconfiguration
+	* DHCP kernel level autoconfiguration
 
-== Features == 
+## Features
 
-=== XIP ===
+### XIP
 
 http://elinux.org/Kernel_XIP
 
 Execute-in-Place (Wikipedia entry) is a method of executing code directly from long-term storage, instead of first loading it into RAM. When the kernel is executed in place, the bootloader does not have to: 
+
 * read the kernel from flash or
 * decompress the kernel and
 * write the kernel to RAM.
 
-=== kexec ===
+### kexec ###
 
 kexec: execute user kernel with pre-initialized hardware
 
-== Minimal linux kernel ==
+## Minimal linux kernel ##
 
 Disable everything else then:
 
-== Explicitly enabled ==
+## Explicitly enabled ##
 
 CONFIG_CC_OPTIMIZE_FOR_SIZE
 Enabling this option will pass "-Os" instead of "-O2" to gcc  resulting in a smaller kernel. 
@@ -83,7 +84,7 @@ The Thumb instruction set is a compressed form of the standard ARM instruction s
 CONFIG_UACCESS_WITH_MEMCPY
 Implement faster copy_to_user and clear_user methods for CPU  cores where a 8-word STM instruction give significantly higher memory write throughput than a sequence of individual 32bit stores.
 
-=== Boot options ===
+### Boot options ###
 
 CONFIG_XIP_KERNEL
 Execute-In-Place allows the kernel to run from non-volatile storage
@@ -91,7 +92,7 @@ Execute-In-Place allows the kernel to run from non-volatile storage
 CONFIG_KEXEC
 kexec is a system call that implements the ability to shutdown your current kernel, and to start another kernel.
 
-=== Enable the block layer ===
+### Enable the block layer ###
 
 CONFIG_BLOCK
 
@@ -107,13 +108,14 @@ This option provides support for normal Windows file systems with long filenames
 
 CONFIG_MSDOS_PARTITION
 
-=== Networking ===
+### Networking ###
 
 CONFIG_INET
 These are the protocols used on the Internet and on most local Ethernets.
 
 CONFIG_IP_PNP
 enables automatic configuration of IP addresses of devices and of the routing table during kernel boot
+
 	CONFIG_IP_PNP_DHCP
 	you want the IP address of your computer to be discovered automatically at boot time using the DHCP protocol 
 
@@ -123,7 +125,7 @@ Select this if you want a library to allocate the Timer/Counter blocks found on 
 CONFIG_ATMEL_TCB_CLKSRC
 Select this to get a high precision clocksource based on a TC block with a 5+ MHz base clock rate.
 
-== network device support ==
+## network device support ##
 
 CONFIG_DM9000
 Support for DM9000 chipset.
@@ -135,7 +137,7 @@ CONFIG_DMADEVICES > CONFIG_AT_HDMAC
 Support the Atmel AHB DMA controller.
 
 
-== explicitly disabled in the minimal kernel, probably needed in full version ==
+## explicitly disabled in the minimal kernel, probably needed in full version ##
 
 CONFIG_ATMEL_PWM
 enables device driver support for the PWM channels
@@ -162,7 +164,7 @@ The CFQ I/O scheduler tries to distribute bandwidth equally
 
 Default I/O scheduler: no/op
 
-=== MMC/MTD support is disabled for XIP ===
+### MMC/MTD support is disabled for XIP ###
 
 CONFIG_MMC
 selects MultiMediaCard, Secure Digital and Secure  Digital I/O support. 
@@ -173,12 +175,12 @@ Say Y here to have the Atmel MCI driver use a DMA engine to do data transfers an
 CONFIG_DMATEST
 Simple DMA test client
 
-== Networking support ==
+## Networking support ##
 
 CONFIG_MII
 Most ethernet controllers have MII transceiver either as an external or internal device
 
-=== Filesystem ===
+### Filesystem ###
 
 CONFIG_PROC_FS
 This is a virtual file system providing information about the status of the system.
@@ -186,7 +188,7 @@ This is a virtual file system providing information about the status of the syst
 CONFIG_SYSFS
 Designers of embedded systems may wish to say N here to conserve space.
 
-=== display ===
+### display ###
 
 CONFIG_FB
 The frame buffer device provides an abstraction for the graphics hardware.
@@ -194,15 +196,15 @@ The frame buffer device provides an abstraction for the graphics hardware.
 CONFIG_BACKLIGHT_LCD_SUPPORT
 Enable this to be able to choose the drivers for controlling the backlight and the LCD panel on some platforms
 
-=== weird options that get turned on... ===
+### weird options that get turned on... ###
 
 CONFIG_SSB
 Support for the Sonics Silicon Backplane bus.
 
 
-== compile errors ==
+## compile errors ##
 
-=== implicit declaration of function 'flush_dcache_page' ===
+### implicit declaration of function 'flush_dcache_page' ###
 
 https://lkml.org/lkml/2012/4/10/375
 None of mmc host drivers using linux/blkdev.h header really need anything from it. The slight exception is
@@ -224,7 +226,7 @@ arch/arm/kernel/head.o: In function `stext':
 make[2]: *** [.tmp_vmlinux1] Error 1
 make[1]: *** [sub-make] Error 2
 
-== Compilation ==
+## Compilation ##
 
 see: https://github.com/Lophilo/linux
 
