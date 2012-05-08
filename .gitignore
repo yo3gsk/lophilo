@@ -8,3 +8,7 @@
 *-aufs
 *.lo
 *.so
+*.bin
+*.elf
+*.d
+.*.swo
