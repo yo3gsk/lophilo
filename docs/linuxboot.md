@@ -65,7 +65,7 @@ kexec: execute user kernel with pre-initialized hardware
 
 Disable everything else then:
 
-## Explicitly enabled ##
+### Kernel options ###
 
 CONFIG_CC_OPTIMIZE_FOR_SIZE
 Enabling this option will pass "-Os" instead of "-O2" to gcc  resulting in a smaller kernel. 
@@ -125,7 +125,7 @@ Select this if you want a library to allocate the Timer/Counter blocks found on 
 CONFIG_ATMEL_TCB_CLKSRC
 Select this to get a high precision clocksource based on a TC block with a 5+ MHz base clock rate.
 
-## network device support ##
+### network device support ###
 
 CONFIG_DM9000
 Support for DM9000 chipset.
@@ -137,7 +137,9 @@ CONFIG_DMADEVICES > CONFIG_AT_HDMAC
 Support the Atmel AHB DMA controller.
 
 
-## explicitly disabled in the minimal kernel, probably needed in full version ##
+## explicitly disabled  ##
+explicitly disabled in the minimal kernel, probably needed in full version
+
 
 CONFIG_ATMEL_PWM
 enables device driver support for the PWM channels
@@ -207,32 +209,38 @@ Support for the Sonics Silicon Backplane bus.
 ### implicit declaration of function 'flush_dcache_page' ###
 
 https://lkml.org/lkml/2012/4/10/375
+
 None of mmc host drivers using linux/blkdev.h header really need anything from it. The slight exception is
 atmel-mci, which uses blkdev.h only because it indirectly pulls asm/cacheflush.h
 
-include/linux/blkdev.h:1420:1: error: unknown type name 'bool'
-include/linux/blkdev.h: In function 'blk_needs_flush_plug':
-include/linux/blkdev.h:1422:9: error: 'false' undeclared (first use in this
- function)
-include/linux/blkdev.h:1422:9: note: each undeclared identifier is reported
- only once for each function it appears in
-drivers/mmc/host/atmel-mci.c: In function 'atmci_read_data_pio':
-drivers/mmc/host/atmel-mci.c:1568:5: error: implicit declaration of functio
-n 'flush_dcache_page' [-Werror=implicit-function-declaration]
-cc1: some warnings being treated as errors
+> include/linux/blkdev.h:1420:1: error: unknown type name 'bool'
+> include/linux/blkdev.h: In function 'blk_needs_flush_plug':
+> include/linux/blkdev.h:1422:9: error: 'false' undeclared (first use in this function)
+> include/linux/blkdev.h:1422:9: note: each undeclared identifier is reported only once for each function it appears in
+>  drivers/mmc/host/atmel-mci.c: In function 'atmci_read_data_pio':
+>  drivers/mmc/host/atmel-mci.c:1568:5: error: implicit declaration of function 'flush_dcache_page' [-Werror=implicit-function-declaration]
+>  cc1: some warnings being treated as errors
 
-arch/arm/kernel/head.o: In function `stext':
-(.head.text+0x34): undefined reference to `PHYS_OFFSET'
-make[2]: *** [.tmp_vmlinux1] Error 1
-make[1]: *** [sub-make] Error 2
+### PHYS_OFFSET ###
+
+>  arch/arm/kernel/head.o: In function `stext':
+>  (.head.text+0x34): undefined reference to `PHYS_OFFSET'
+>  make[2]: *** [.tmp_vmlinux1] Error 1
+>  make[1]: *** [sub-make] Error 2
+
+see Lophilo/linux/patches
 
 ## Compilation ##
 
+### Where to find the source ###
+
 see: https://github.com/Lophilo/linux
 
-This is pulled in as a submodule to https://github.com/Lophilo/lophilo
+This is also pulled in as a submodule to https://github.com/Lophilo/lophilo
 
-makel is in lophilo/bin/makel
+makel is a tiny make wrapper in lophilo/bin/makel
+
+### Build ###
 
 Modify configuration:
 
@@ -245,6 +253,8 @@ makel minimal_kernel
 output is in : lophilo/obj/linux/arch/arm/boot/xipImage
 
 arch/arm/boot/xipImage is ready (physical address: 0x00080000)
+
+### Output ###
 
 Kernel: 
 
