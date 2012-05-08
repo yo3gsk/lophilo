@@ -1,3 +1,87 @@
+= TODO =
+
+== Conversion recipe ==
+
+* _mem_write and _mem_read functions 
+** take and return uint64_t instead of uint32_t 
+** take a size parameter
+* CPUReadMemoryFunc is deprecated; use MemoryRegionOps instead
+* VMState saving functions have been replaced by VMStateDescription structures
+** heavy use of macros
+** replace any additional action with a .post_load function
+* State
+** move any register to the State structure
+* Memory allocation
+** cpu_register_io_memory is replaced by memory_region_init_io
+
+* Init
+** reset, qemu_register_reset and register_savevm calls are unnecessary
+** these are done through setting callbacks in _class_init
+** function returns int (0) instead of void
+* register and device_init have been replaced by type registration (and eventual instantiation)
+
+* _reset
+** _reset function takes a DeviceState* instead of void*
+** to retrieve the state, use: `= container_of(d, PMCState, busdev.qdev);`
+
+*SysBusDeviceInfo becomes TypeInfo with paranet TYPE_SYS_BUS_DEVICE
+
+* qdev_get_vlan_client 
+** replaced by a struct NetClientInfo
+** registered with qemu_new_nic
+** takes in a NICConf parameter (stored in the state)
+
+* for machine
+** flash.h must be included explicitly if using flash functions
+
+== Conversion QEMU 0.11 to QEMU 1.0 ==
+
+* list of files to move
+** hw/at91*
+** hw/spi_flash.c (with update to hw/flash.h)
+
+* Move up at91 source against QEMU HEAD
+** cpu_register_physical_memory 
+*** MemoryRegion
+*** memory_region_init_ram
+*** vmstate_register_ram_global
+*** memory_region_add_subregion
+
+** IO_MEM_RAM -> ???
+** IO_MEM
+** IF_PFLASH -> ???
+** qemu_mallocz -> ???
+** qemu_ram_alloc -> ???
+** CPUState -> CPUARMState
+** CPUState.regs -> ??
+* Submit patches for at91* to QEMU
+
+== Adapt to real hardware ==
+
+* create lophilo.c that copies at91sam9.c into a separate instance
+** update the CPU
+** update hardware configuration to match ours
+** remove norflash and nandflash (not connected in our configuration)
+** change chip select for DDR RAM to 1, not 0 (zero is connected to the FPGA)
+*** at91_sdramc0 -> at91_sdramc1
+* Get DDR initialization with at91bootstrap working
+* Get Serial port working (DBGU? USART? both?)
+** at91sam9_state->dbgu is commented out
+** usart0_regs are present
+* Get SD Card working
+
+= SPI =
+
+AT91_SPI0_BASE (interrupt 14): 0xFFFA4000
+
+
+boot room (assembly code equivalent)
+	SPI read from flash and copy to internal SRAM (0x00300000)
+	Branch to 0x00300000
+
+load directly the "bootrom" to 0x0030000
+setup c
+write code to branch to 0x00300000	
 
 = usage =
 
@@ -55,36 +139,6 @@ make install
 = running =
 
  -trace events=/tmp/events 
-= Lophilo target =
-
-* ARM926EJ-S
-* AC'97 controller
-
-
-= Other examples =
-
-* Machines have a descriptor QEMUMachine
-* Machines all have a state structure defining buses, memory and registers
-* functions to read, write these registers are provided
-* the control registers are set in the init function with cpu_register_io_memory and registered with sysbus_init_mmio
-* a primary interrupt control with read/write/set functions is also created
-* the init function 
-** takes a kernel image to load in
-** initialize the CPU with cpu_init (and later, arm_cpu_init)
-** initialize RAM and sets the various subregions
-** creates various devices on the system bus
-** passes kernel parameters to struct arm_boot_info
-
-everything is registered through this:
-
-static void integratorcp_machine_init(void)
-{
-    qemu_register_machine(&integratorcp_machine);
-}
-
-machine_init(integratorcp_machine_init);
-
-** kicks off boot with arm_load_kernel(CPUState*, struct* arm_boot_info);
 
 = beagleboard support =
 

@@ -1,0 +1,28 @@
+main
+	InitSys 
+		initialize hardware
+	tapdev_init() 
+		initialize network device
+	clock_init() 
+		initialize clocks
+	uip_init
+		initialize all the ports to zero
+	dhcpc_init		
+		does nothing (commented out code)
+	dhcpc_appcall
+		handle_dhcp
+			thread
+				send_discover
+				send_request
+				dhcpc_configured
+				optionally resolve DNS (if __RESOLV_H_ is set)
+	app_init 
+		httpd_init
+			uip_listen(80)
+				set uip_listenports to port
+	while(1)
+		read and process packets
+		uip_input -> uip_process
+
+..\bin\mboot.axf: Error: L6218E: Undefined symbol uip_udp_periodic (referred from main.o).
+
