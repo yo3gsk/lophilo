@@ -1,3 +1,6 @@
 [submodule "upstream/qemu"]
 	path = upstream/qemu
 	url = git://git.qemu.org/qemu.git
+[submodule "upstream/linux"]
+	path = upstream/linux
+	url = git@github.com:Lophilo/linux.git

@@ -84,11 +84,6 @@ zlib:
 	mkdir -p ${LOPHILO_DIR}/$@-aufs
 	sudo mount -t aufs -o br=${LOPHILO_DIR}/$@:${UPSTREAM}/$@ none ${LOPHILO_DIR}/$@-aufs
 
-linux-sam9m10:
-	mkdir -p ${LOPHILO_DIR}/$@
-	mkdir -p ${LOPHILO_DIR}/$@-aufs
-	sudo mount -t aufs -o br=${LOPHILO_DIR}/$@:${UPSTREAM}/$@ none ${LOPHILO_DIR}/$@-aufs
-
 build-couchdb:
 	mkdir -p ${LOPHILO_DIR}/$@
 	mkdir -p ${LOPHILO_DIR}/$@-aufs
