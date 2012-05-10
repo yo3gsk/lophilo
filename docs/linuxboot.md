@@ -61,6 +61,13 @@ Execute-in-Place (Wikipedia entry) is a method of executing code directly from l
 
 kexec: execute user kernel with pre-initialized hardware
 
+### Thumb-2 instruction set
+
+20% size reduction achievable here:
+
+* http://www.cnx-software.com/2011/04/22/compile-with-arm-thumb2-reduce-memory-footprint-and-improve-performance/
+* http://www.digipedia.pl/usenet/thread/11185/42927/
+
 ## Minimal linux kernel ##
 
 Disable everything else then:

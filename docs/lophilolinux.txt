@@ -1,0 +1,72 @@
+# Lophilo Linux
+
+## Configuration
+
+Based on the AT91SAMG45 configuration.
+
+We do `make ARCH=arm at91sam9g45_defconfig` and then make modifications based on our differences.
+
+Below configuration notes for each feature
+
+## General Linux kernel 
+
+* General setup
+	* Kernel .config support CONFIG_IKCONFIG
+	* /proc/config.gz CONFIG_IKCONFIG_PROC
+	* DISABLE Initial RAM filesystem CONFIG_BLK_DEV_INITRD
+	* DISABLE Optimize for size CONFIG_CC_OPTIMIZE_FOR_SIZE
+
+* System type
+	* Atmel AT91 System-on-Chip
+		* AT91_EARLY_USART1
+
+* Boot options
+	* Default kernel command string: mem=128M console=ttyS1,115200o81 rw
+		* no initrd drive
+		* mem=128M
+		* root device (MicroSD card, 2nd partition) 
+		* console=ttyS1,115200o81
+			* Speed (baud): 115200		
+			* Data bits: 8
+			* Stop bits: 1
+			* Parity: Odd -> o
+			* Flow control: none
+
+* Enable the block layer
+	* Advanced partition selection CONFIG_PARTITION_ADVANCED
+		* CONFIG_MSDOS_PARTITION
+	* I/O Schedulers -> No-op
+
+* Filesystems
+	* DISABLE CONFIG_EXT2_FS
+	* CONFIG_EXT4_FS
+	* CONFIG_MSDOS_FS (strangely, VFAT is enabled...)
+
+Atmel specific (already enabled by default):
+
+* Device drivers
+	* Sound card support
+		* CONFIG_SND_ATMEL_AC97C
+
+* Device Drivers
+	* Character devices
+		* Serial drivers
+			* CONFIG_SERIAL_ATMEL
+			* CONFIG_SERIAL_ATMEL_CONSOLE
+			* DISABLE CONFIG_SERIAL_ATMEL_PDC
+			Note that break and error handling currently doesn't work properly when DMA is enabled. Make sure that ports where this matters don't use DMA.   
+		* CONFIG_HW_RANDOM_ATMEL
+
+
+
+## Wifi header
+
+* cfg80211 /  firmware file rtlwifi/rtl8192cufw.bin
+* CONFIG_CFG80211 should be enabled
+
+## MicroSD card
+
+## compile errors
+
+/home/rngadam/lophilo/upstream/linux/arch/arm/include/asm/memory.h:169:0: warning: "PHYS_OFFSET" redefined [enabled by default]
+/home/rngadam/lophilo/upstream/linux/arch/arm/include/asm/memory.h:148:0: note: this is the location of the previous definition
