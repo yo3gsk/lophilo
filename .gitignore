@@ -12,3 +12,5 @@
 *.elf
 *.d
 .*.swo
+obj/*
+.*.swp
