@@ -27,9 +27,11 @@ Set partition type to W95 FAT32
 	t 1 b
 
 Make it bootable:
+
 	a 1
 
 Create new ext4 partition
+
 	n p 2 <enter> <enter>
 
 Output should be:
@@ -73,3 +75,11 @@ Should now be available on:
 
 	 /media/lophilofat32 
 	 /media/lophiloext4
+
+## setting up zImage and filesystem
+
+see Lophilo/linux/Makefile.lophilo:setup-microsd
+
+This target can be run from Lophilo/lophilo/linux submodule as:
+
+	makel setup-microsd
