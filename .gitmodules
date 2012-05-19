@@ -1,3 +1,0 @@
-[submodule "upstream/qemu"]
-	path = upstream/qemu
-	url = git://git.qemu.org/qemu.git
