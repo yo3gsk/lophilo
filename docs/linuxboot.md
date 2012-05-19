@@ -147,7 +147,6 @@ Support the Atmel AHB DMA controller.
 ## explicitly disabled  ##
 explicitly disabled in the minimal kernel, probably needed in full version
 
-
 CONFIG_ATMEL_PWM
 enables device driver support for the PWM channels
 

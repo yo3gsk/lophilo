@@ -50,8 +50,8 @@
 ** IO_MEM_RAM -> ???
 ** IO_MEM
 ** IF_PFLASH -> ???
-** qemu_mallocz -> ???
-** qemu_ram_alloc -> ???
+** qemu_mallocz -> g_new
+** qemu_ram_alloc -> g_new
 ** CPUState -> CPUARMState
 ** CPUState.regs -> ??
 * Submit patches for at91* to QEMU

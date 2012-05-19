@@ -35,7 +35,12 @@ gdb ./arm-softmmu/qemu-system-arm
 
 In another shell:
 
-	../../codesourcery/arm926ej-s/gdb target remote :1234
+	../../codesourcery/arm926ej-s/gdb 
+	target remote :1234
+
+## With lophilo
+
+ ./arm-softmmu/qemu-system-arm -M lophilo -kernel /media/lophilofat32/zImage -s -nographic 
 
 ## Current state
 
