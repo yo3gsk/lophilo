@@ -1,0 +1,13 @@
+export LOPHILOFAT32DEV:=/dev/sdb1
+export LOPHILOEXT4DEV:=/dev/sdb2
+
+/usr/bin/pmount:
+	sudo apt-get install usbmount
+
+/media/lophilofat32: /usr/bin/pmount
+	-pumount ${LOPHILOFAT32DEV} 
+	pmount ${LOPHILOFAT32DEV} lophilofat32
+
+/media/lophiloext4: /usr/bin/pmount
+	-pumount ${LOPHILOEXT4DEV}
+	pmount ${LOPHILOEXT4DEV} lophiloext4

@@ -1,7 +1,7 @@
 UPSTREAM=${HOME}/upstream
 LOPHILO_DIR=.
 
-.PHONY: qemu linux all nodejs upstream openssl v8 npm2debian zlib build-couchdb linux-sam9m10 setup
+.PHONY: all nodejs upstream openssl v8 npm2debian zlib build-couchdb setup
 
 all: 
 	@echo "mount disks with `make aufs`"
@@ -49,24 +49,12 @@ codesourcery: /opt/codesourcery/arm-2011.09/bin/arm-none-linux-gnueabi-gcc
 	# from our custom Lophilo repository...
 	sudo apt-get install codesourcery-arm
 
-aufs: linux nodejs openssl v8 npm2debian zlib qemu build-couchdb
-
-linux:
-	# make-kpkg packages symlinks... and has no option
-	# to build out of tree
-	#cp -rsu ${UPSTREAM}/linux ${LOPHILO_DIR}
-	mkdir -p ${LOPHILO_DIR}/linux-aufs
-	sudo mount -t aufs -o br=${LOPHILO_DIR}/linux:${UPSTREAM}/linux none ${LOPHILO_DIR}/linux-aufs
+aufs: nodejs openssl v8 npm2debian zlib build-couchdb
 
 nodejs:
 	# node.js tries to write to the config files...
 	mkdir -p ${LOPHILO_DIR}/node-aufs
 	sudo mount -t aufs -o br=${LOPHILO_DIR}/node:${UPSTREAM}/node none ${LOPHILO_DIR}/node-aufs
-
-qemu:
-	mkdir -p ${LOPHILO_DIR}/$@
-	mkdir -p ${LOPHILO_DIR}/$@-aufs
-	sudo mount -t aufs -o br=${LOPHILO_DIR}/$@:${UPSTREAM}/$@ none ${LOPHILO_DIR}/$@-aufs
 
 upstream:
 	mkdir -p ${UPSTREAM}
@@ -86,11 +74,6 @@ npm2debian:
 	sudo mount -t aufs -o br=${LOPHILO_DIR}/$@:${UPSTREAM}/$@ none ${LOPHILO_DIR}/$@-aufs
 
 zlib:
-	mkdir -p ${LOPHILO_DIR}/$@
-	mkdir -p ${LOPHILO_DIR}/$@-aufs
-	sudo mount -t aufs -o br=${LOPHILO_DIR}/$@:${UPSTREAM}/$@ none ${LOPHILO_DIR}/$@-aufs
-
-linux-sam9m10:
 	mkdir -p ${LOPHILO_DIR}/$@
 	mkdir -p ${LOPHILO_DIR}/$@-aufs
 	sudo mount -t aufs -o br=${LOPHILO_DIR}/$@:${UPSTREAM}/$@ none ${LOPHILO_DIR}/$@-aufs

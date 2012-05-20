@@ -1,0 +1,10 @@
+linking...
+..\bin\mboot.axf: Error: L6221E: Execution region Fixed_region with Execution range [0x00300000,0x0030f5dc) overlaps with Execution region ARM_LIB_HEAP with Execution range [0x0030e000,0x0030f000).
+..\bin\mboot.axf: Error: L6221E: Execution region Fixed_region with Execution range [0x00300000,0x0030f5dc) overlaps with Execution region ARM_LIB_STACK with Execution range [0x0030f000,0x00310000).
+..\bin\mboot.axf: Error: L6221E: Execution region Relocate_region with Execution range [0x0030f5dc,0x0030f674) overlaps with Execution region ARM_LIB_STACK with Execution range [0x0030f000,0x00310000).
+..\bin\mboot.axf: Error: L6388E: ScatterAssert expression ((ImageLength(Fixed_region) + ImageLength(Relocate_region)) < 0xf000) failed on line 21 : (0xf674 < 0xf000)
+
+..\bin\mboot.axf: Error: L6221E: Execution region Fixed_region with Execution range [0x00300000,0x0030f5dc) overlaps with Execution region ARM_LIB_HEAP with Execution range [0x0030e000,0x0030f000).
+..\bin\mboot.axf: Error: L6221E: Execution region Fixed_region with Execution range [0x00300000,0x0030f5dc) overlaps with Execution region ARM_LIB_STACK with Execution range [0x0030f000,0x00310000).
+..\bin\mboot.axf: Error: L6221E: Execution region Relocate_region with Execution range [0x0030f5dc,0x0030f674) overlaps with Execution region ARM_LIB_STACK with Execution range [0x0030f000,0x00310000).
+..\bin\mboot.axf: Error: L6388E: ScatterAssert expression ((ImageLength(Fixed_region) + ImageLength(Relocate_region)) < 0xf000) failed on line 21 : (0xf674 < 0xf000)

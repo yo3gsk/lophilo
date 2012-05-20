@@ -1,6 +1,7 @@
 using apt-cacher-ng
 
 packages are stored in /var/www/repos/
+
 = package signing =
 
 rngadam@cnshaqs10:~$ gpg --list-keys
@@ -12,7 +13,8 @@ sub   2048R/A84DD3F8 2012-03-13
 
 
 
-= client =
+= client =ls
+
 
 Debian:
 

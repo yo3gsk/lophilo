@@ -1,38 +1,76 @@
 # http://www.emdebian.org/release/squeeze.html
-TARGET=/exports/squeeze
-HOSTNAME=squeeze1
-.PHONY: stage1
 
-stage1:
-	debootstrap --arch=armel --foreign squeeze ${TARGET} http://www.emdebian.org/grip/
-	@echo "Modify /etc/exports to export ${TARGET}"
+include ../Makefile.microsd
 
-setup: setupfs setupnet setupdev setupterm setupsources
-	@echo "Boot to init=/bin/sh using QEMU"
+TARGET_DIR=../obj/squeeze
+HOSTNAME=lophilo
+DEFAULT_SERIAL_CONSOLE=ttyS1
+DEFAULT_SERIAL_CONSOLE_MAJOR=4
+DEFAULT_SERIAL_CONSOLE_MINOR=65
+DEFAULT_SERIAL_CONSOLE_TARGET:=${TARGET_DIR}/dev/${DEFAULT_SERIAL_CONSOLE}
+STAGE1_INDICATOR:=${TARGET_DIR}/debootstrap/debootstrap
+
+.PHONY: setup
+
+#
+# initial image creation from the host system
+#
+
+${TARGET_DIR}:
+	mkdir -p ${TARGET_DIR}
+
+/usr/bin/debootstrap:
+	sudo apt-get install debootstrap
+
+${TARGET_DIR}/debootstrap/debootstrap: ${TARGET_DIR} /usr/bin/debootstrap
+	sudo debootstrap --arch=armel --foreign squeeze ${TARGET_DIR} http://www.emdebian.org/grip/
+	@echo "Modify /etc/exports to export ${TARGET_DIR} if you want to use NFSROOT"
+
+#
+# setup tasks
+#
+
+copy-to-microsd: setup /media/lophiloext4
+	sudo rsync -avz ${TARGET_DIR}/ /media/lophiloext4/
+	pumount ${LOPHILOEXT4DEV}
+
+${TARGET_DIR}/firstboot.sh: firstboot.sh
+	sudo cp firstboot.sh $@
+	sudo chmod a+rx $@
+
+setup: ${TARGET_DIR}/etc/fstab ${TARGET_DIR}/etc/hostname ${TARGET_DIR}/etc/securetty ${TARGET_DIR}/etc/inittab /etc/exports ${TARGET_DIR}/firstboot.sh
+	@echo "Boot to init=/bin/sh using QEMU or the real device"
 	@echo "run /debootstrap/debootstrap --second-stage"
-setupfs:
-	echo "proc /proc proc none 0 0" >> ${TARGET}/etc/fstab
-setupnet:
-	echo "squeeze1" > ${TARGET}/etc/hostname
-	mkdir -p ${TARGET}/usr/share/man/man1/
-setupdev:
-	mknod ${TARGET}/dev/console c 5 1
-	mknod ${TARGET}/dev/ttyAMA0 c 204 64
-	@echo "Set root password"
+	@echo "Please set root password on target system"
 
-setupterm:
-	echo "ttyAMA0" >> ${TARGET}/etc/securetty
-	echo "T0:123:respawn:/sbin/getty 115200 ttyAMA0" >> ${TARGET}/etc/inittab
+${TARGET_DIR}/etc/fstab: ${STAGE1_INDICATOR}
+	@echo "Setting up /proc for $@"
+	sudo sh -c "echo 'proc /proc proc none 0 0' >> $@"
 
-setupsources:
-	cp sources.list ${TARGET}/etc/apt
-	@echo "apt-get update"
+${TARGET_DIR}/etc/hostname: ${TARGET_DIR}/bin/hostname ${STAGE1_INDICATOR}
+	sudo sh -c "echo ${HOSTNAME} > $@"
+	sudo mkdir -p ${TARGET_DIR}/usr/share/man/man1/
 
-packages:
-	@echo "apt-get install build-essential git ntpdate openssh-server nfs-client screen sudo"
+${TARGET_DIR}/dev/console: ${STAGE1_INDICATOR}
+	sudo mknod $@ c 5 1
 
-setuptime:
-	@echo "edit /etc/rc.local and add `ntpdate 2.asia.pool.ntp.org`
+${TARGET_DIR}/etc/securetty: ${DEFAULT_SERIAL_CONSOLE_TARGET} ${STAGE1_INDICATOR}
+	sudo sh -c "echo ${DEFAULT_SERIAL_CONSOLE} >> ${TARGET_DIR}/etc/securetty"
 
-nfs:
+${TARGET_DIR}/etc/inittab: ${DEFAULT_SERIAL_CONSOLE_TARGET} ${STAGE1_INDICATOR}
+	sudo sh -c "echo 'T0:123:respawn:/sbin/getty 115200 ${DEFAULT_SERIAL_CONSOLE}' >> $@"
+
+${TARGET_DIR}/etc/apt/sources.list: ${STAGE1_INDICATOR}
+	sudo cp sources.list ${TARGET_DIR}/etc/apt
+
+${TARGET_DIR}/etc/rc.local: ${STAGE1_INDICATOR}
+	sudo sh -c "echo ntpdate 2.asia.pool.ntp.org >> $@"
+
+#
+# sub-targets
+#
+${DEFAULT_SERIAL_CONSOLE_TARGET}: 
+	sudo mknod ${TARGET_DIR}/dev/${DEFAULT_SERIAL_CONSOLE} c ${DEFAULT_SERIAL_CONSOLE_MAJOR} ${DEFAULT_SERIAL_CONSOLE_MINOR}
+
+/etc/exports: ${TARGET_DIR}
 	sudo service nfs-kernel-server restart

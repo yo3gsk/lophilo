@@ -12,3 +12,6 @@
 *.elf
 *.d
 .*.swo
+obj/*
+.*.swp
+upstream/*
