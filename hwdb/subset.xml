@@ -1,0 +1,869 @@
+<html>
+<head>
+<meta name="generator" content=
+"HTML Tidy for Linux/x86 (vers 25 March 2009), see www.w3.org" />
+<title>Schematic Library Report</title>
+</head>
+<body>
+<h1 class="c1">Schematic Library Report</h1>
+<table border="0" cellspacing="0" cellpadding="4" width="100%">
+<tr>
+<td valign="top" width="30%"><span class="c2">Library File
+Name</span></td>
+<td valign="top"><span class=
+"c3">D:\Local\lophilo\Hardware\XEM-S91\Design\Source\PCB_XEM-S91.SchLib</span></td>
+</tr>
+<tr>
+<td valign="top" width="30%"><span class="c2">Library File
+Date/Time</span></td>
+<td valign="top"><span class="c3">Friday, March 16, 2012 7:48:57
+AM</span></td>
+</tr>
+<tr>
+<td valign="top" width="30%"><span class="c2">Library File
+Size</span></td>
+<td valign="top"><span class="c3">151552</span></td>
+</tr>
+<tr>
+<td valign="top" width="30%"><span class="c2">Number of
+Components</span></td>
+<td valign="top"><span class="c3">13</span></td>
+</tr>
+<tr>
+<td valign="top" width="30%"><span class="c2">Component
+List</span></td>
+<td valign="top"><span class="c3">AMC7891, AT45DB081D, DM3C-SF,
+EP4CE15F23, K4T1G164Q, K4T51083Q, MC24LC64, SAM9M10, SAM9M10_CHECK,
+SI1563EDH, TPS62260, TPS650240, XEM-EDGE</span></td>
+</tr>
+</table>
+<hr />
+<table border="0" cellspacing="0" cellpadding="4" width="100%">
+<tr>
+<td valign="top" width="30%"></td>
+<td valign="top">
+<table border="0" cellspacing="0" cellpadding="2" width="100%">
+<tr>
+<td valign="top" width="30%"><span class="c2">Library
+Reference</span></td>
+<td valign="top">
+<h2 class="c4">AMC7891</h2>
+</td>
+</tr>
+<tr>
+<td valign="top" width="30%"><span class=
+"c2">Description</span></td>
+<td valign="top"><span class="c3">Integrated DAC/ADC</span></td>
+</tr>
+<tr>
+<td valign="top" width="30%"><span class="c2">Kind</span></td>
+<td valign="top"><span class="c3">Standard</span></td>
+</tr>
+<tr>
+<td valign="top" width="30%"><span class="c2">Aliases</span></td>
+<td valign="top"><span class="c3">Component has no
+aliases</span></td>
+</tr>
+<tr>
+<td valign="top" width="30%"><span class=
+"c2">Designator</span></td>
+<td valign="top"><span class="c3">U?</span></td>
+</tr>
+<tr>
+<td valign="top" width="30%"><span class="c2">Number of
+Parameters</span></td>
+<td valign="top"><span class="c3">12</span></td>
+</tr>
+<tr>
+<td valign="top" width="30%"><span class="c2">Number of
+Pins</span></td>
+<td valign="top"><span class="c3">37</span></td>
+</tr>
+<tr>
+<td valign="top" width="30%"><span class="c2">Number of
+Models</span></td>
+<td valign="top"><span class="c3">1</span></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<h5 class="c5">Parameters</h5>
+<table border="1" cellspacing="0" cellpadding="2" width="100%">
+<tr>
+<td align="center" valign="top"><span class="c2">Name</span></td>
+<td align="center" valign="top"><span class="c2">Value</span></td>
+<td align="center" valign="top"><span class="c2">Type</span></td>
+<td align="center" valign="top"><span class=
+"c2">Visible</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">PartNumber</span></td>
+<td valign="top"><span class="c3">AMC7891</span></td>
+<td valign="top"><span class="c3">STRING</span></td>
+<td valign="top"><span class="c3">False</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">Value</span></td>
+<td valign="top"><span class="c3">AMC7891</span></td>
+<td valign="top"><span class="c3">STRING</span></td>
+<td valign="top"><span class="c3">False</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">Vendor</span></td>
+<td valign="top"><span class="c3">TI</span></td>
+<td valign="top"><span class="c3">STRING</span></td>
+<td valign="top"><span class="c3">False</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">Version</span></td>
+<td valign="top"><span class="c3">1.0</span></td>
+<td valign="top"><span class="c3">STRING</span></td>
+<td valign="top"><span class="c3">False</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">VersionDate</span></td>
+<td valign="top"><span class="c3">02-22-2012</span></td>
+<td valign="top"><span class="c3">STRING</span></td>
+<td valign="top"><span class="c3">False</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">SerialNumber</span></td>
+<td valign="top"><span class="c3">0</span></td>
+<td valign="top"><span class="c3">STRING</span></td>
+<td valign="top"><span class="c3">False</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">PCBMarker</span></td>
+<td valign="top"><span class="c3">FET COMP</span></td>
+<td valign="top"><span class="c3">STRING</span></td>
+<td valign="top"><span class="c3">False</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">Publisher</span></td>
+<td valign="top"><span class="c3">Cowin</span></td>
+<td valign="top"><span class="c3">STRING</span></td>
+<td valign="top"><span class="c3">False</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">PinCountSMD</span></td>
+<td valign="top"><span class="c3">37</span></td>
+<td valign="top"><span class="c3">STRING</span></td>
+<td valign="top"><span class="c3">False</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">PinCountHole</span></td>
+<td valign="top"><span class="c3">0</span></td>
+<td valign="top"><span class="c3">STRING</span></td>
+<td valign="top"><span class="c3">False</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">Designer</span></td>
+<td valign="top"><span class="c3">shyul</span></td>
+<td valign="top"><span class="c3">STRING</span></td>
+<td valign="top"><span class="c3">False</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">Comment</span></td>
+<td valign="top"><span class="c3">=Value</span></td>
+<td valign="top"><span class="c3">STRING</span></td>
+<td valign="top"><span class="c3">True</span></td>
+</tr>
+</table>
+<h5 class="c5">Pins</h5>
+<table border="1" cellspacing="0" cellpadding="2" width="100%">
+<tr>
+<td align="center" valign="top"><span class=
+"c2">Designator</span></td>
+<td align="center" valign="top"><span class="c2">Name</span></td>
+<td align="center" valign="top"><span class="c2">X1</span></td>
+<td align="center" valign="top"><span class="c2">Y1</span></td>
+<td align="center" valign="top"><span class=
+"c2">Orientation</span></td>
+<td align="center" valign="top"><span class="c2">Color</span></td>
+<td align="center" valign="top"><span class="c2">Type</span></td>
+<td align="center" valign="top"><span class="c2">Show</span></td>
+<td align="center" valign="top"><span class="c2">Show
+Name</span></td>
+<td align="center" valign="top"><span class="c2">Show
+Number</span></td>
+<td align="center" valign="top"><span class="c2">Width</span></td>
+<td align="center" valign="top"><span class="c2">Length</span></td>
+<td align="center" valign="top"><span class="c2">Inner
+Symbol</span></td>
+<td align="center" valign="top"><span class="c2">Outer
+Symbol</span></td>
+<td align="center" valign="top"><span class="c2">Inner Edge
+Symbol</span></td>
+<td align="center" valign="top"><span class="c2">Outer Edge
+Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">AVDD</span></td>
+<td valign="top"><span class="c3">0mil</span></td>
+<td valign="top"><span class="c3">-2in</span></td>
+<td valign="top"><span class="c3">180 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Passive</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">2</span></td>
+<td valign="top"><span class="c3">AGND</span></td>
+<td valign="top"><span class="c3">0mil</span></td>
+<td valign="top"><span class="c3">-2.9in</span></td>
+<td valign="top"><span class="c3">180 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Passive</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">3</span></td>
+<td valign="top"><span class="c3">DGND</span></td>
+<td valign="top"><span class="c3">0mil</span></td>
+<td valign="top"><span class="c3">-2.8in</span></td>
+<td valign="top"><span class="c3">180 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Passive</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">4</span></td>
+<td valign="top"><span class="c3">GPIOVDD</span></td>
+<td valign="top"><span class="c3">0mil</span></td>
+<td valign="top"><span class="c3">-1.8in</span></td>
+<td valign="top"><span class="c3">180 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Passive</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">5</span></td>
+<td valign="top"><span class="c3">SPIVDD</span></td>
+<td valign="top"><span class="c3">0mil</span></td>
+<td valign="top"><span class="c3">-1.7in</span></td>
+<td valign="top"><span class="c3">180 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Passive</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">6</span></td>
+<td valign="top"><span class="c3">nCS</span></td>
+<td valign="top"><span class="c3">0mil</span></td>
+<td valign="top"><span class="c3">-0.5in</span></td>
+<td valign="top"><span class="c3">180 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Input</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">7</span></td>
+<td valign="top"><span class="c3">SCLK</span></td>
+<td valign="top"><span class="c3">0mil</span></td>
+<td valign="top"><span class="c3">-400mil</span></td>
+<td valign="top"><span class="c3">180 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Input</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">Clock</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">8</span></td>
+<td valign="top"><span class="c3">SDI</span></td>
+<td valign="top"><span class="c3">0mil</span></td>
+<td valign="top"><span class="c3">-300mil</span></td>
+<td valign="top"><span class="c3">180 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Input</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">9</span></td>
+<td valign="top"><span class="c3">SDO</span></td>
+<td valign="top"><span class="c3">0mil</span></td>
+<td valign="top"><span class="c3">-200mil</span></td>
+<td valign="top"><span class="c3">180 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Output</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">10</span></td>
+<td valign="top"><span class="c3">DACOUT3</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-1.5in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Output</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">11</span></td>
+<td valign="top"><span class="c3">DACOUT2</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-1.4in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Output</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">12</span></td>
+<td valign="top"><span class="c3">DACOUT1</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-1.3in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Output</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">13</span></td>
+<td valign="top"><span class="c3">DACOUT0</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-1.2in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Output</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">14</span></td>
+<td valign="top"><span class="c3">AGND</span></td>
+<td valign="top"><span class="c3">0mil</span></td>
+<td valign="top"><span class="c3">-3in</span></td>
+<td valign="top"><span class="c3">180 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Passive</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">15</span></td>
+<td valign="top"><span class="c3">GPIOC3</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-3.1in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">I/O</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">16</span></td>
+<td valign="top"><span class="c3">GPIOC2</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-3in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">I/O</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">17</span></td>
+<td valign="top"><span class="c3">GPIOC1</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-2.9in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">I/O</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">18</span></td>
+<td valign="top"><span class="c3">GPIOC0</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-2.8in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">I/O</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">19</span></td>
+<td valign="top"><span class="c3">nDAV</span></td>
+<td valign="top"><span class="c3">0mil</span></td>
+<td valign="top"><span class="c3">-0.7in</span></td>
+<td valign="top"><span class="c3">180 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Output</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">Dot</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">20</span></td>
+<td valign="top"><span class="c3">GPIOB3</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-2.6in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">I/O</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">21</span></td>
+<td valign="top"><span class="c3">GPIOB2</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-2.5in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">I/O</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">22</span></td>
+<td valign="top"><span class="c3">GPIOB1</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-2.4in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">I/O</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">23</span></td>
+<td valign="top"><span class="c3">GPIOB0</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-2.3in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">I/O</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">24</span></td>
+<td valign="top"><span class="c3">GPIOA3</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-2.1in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">I/O</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">25</span></td>
+<td valign="top"><span class="c3">GPIOA2</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-2in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">I/O</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">26</span></td>
+<td valign="top"><span class="c3">GPIOA1</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-1.9in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">I/O</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">27</span></td>
+<td valign="top"><span class="c3">GPIOA0</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-1.8in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">I/O</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">28</span></td>
+<td valign="top"><span class="c3">AIN0</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-200mil</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Input</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">29</span></td>
+<td valign="top"><span class="c3">AIN1</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-300mil</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Input</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">30</span></td>
+<td valign="top"><span class="c3">AIN2</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-400mil</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Input</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">31</span></td>
+<td valign="top"><span class="c3">AIN3</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-0.5in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Input</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">32</span></td>
+<td valign="top"><span class="c3">AIN4</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-0.6in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Input</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">33</span></td>
+<td valign="top"><span class="c3">AIN5</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-0.7in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Input</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">34</span></td>
+<td valign="top"><span class="c3">AIN6</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-0.8in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Input</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">35</span></td>
+<td valign="top"><span class="c3">AIN7</span></td>
+<td valign="top"><span class="c3">1.2in</span></td>
+<td valign="top"><span class="c3">-0.9in</span></td>
+<td valign="top"><span class="c3">0 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Input</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">36</span></td>
+<td valign="top"><span class="c3">REF</span></td>
+<td valign="top"><span class="c3">0mil</span></td>
+<td valign="top"><span class="c3">-2.2in</span></td>
+<td valign="top"><span class="c3">180 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">I/O</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+<tr>
+<td valign="top"><span class="c3">P</span></td>
+<td valign="top"><span class="c3">GND</span></td>
+<td valign="top"><span class="c3">0mil</span></td>
+<td valign="top"><span class="c3">-3.1in</span></td>
+<td valign="top"><span class="c3">180 Degrees</span></td>
+<td valign="top"><span class="c3">Black</span></td>
+<td valign="top"><span class="c3">Passive</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">True</span></td>
+<td valign="top"><span class="c3">1</span></td>
+<td valign="top"><span class="c3">300mil</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+<td valign="top"><span class="c3">No Symbol</span></td>
+</tr>
+</table>
+</body>
+</html>
